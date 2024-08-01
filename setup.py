@@ -151,6 +151,15 @@ def main(debug: bool) -> None:
                 extra_compile_args={"cxx": cxx_args[target_os], "nvcc": nvcc_args},
                 include_dirs=include_dir,
             ),
+            CUDAExtension(
+                "drtk.kernel_splatting_ext",
+                sources=[
+                    "src/kernel_splatting/kernel_splatting_module.cpp",
+                    "src/kernel_splatting/kernel_splatting_kernel.cu",
+                ],
+                extra_compile_args={"cxx": cxx_args[target_os], "nvcc": nvcc_args},
+                include_dirs=include_dir,
+            ),
         ],
         cmdclass={"build_ext": BuildExtension},
         packages=["drtk", "drtk.utils"],

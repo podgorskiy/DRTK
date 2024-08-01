@@ -12,5 +12,6 @@ from .msi import msi  # noqa
 from .rasterize import rasterize  # noqa
 from .render import render, render_ref  # noqa
 from .transform import transform  # noqa
+from .kernel_splatting import kernel_splatting  # noqa
 
 __version__ = "0.1.0"  # noqa
