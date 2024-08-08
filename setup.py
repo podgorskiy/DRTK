@@ -10,7 +10,6 @@ import re
 import sys
 
 from pkg_resources import DistributionNotFound, get_distribution
-
 from setuptools import setup
 from torch.utils.cpp_extension import BuildExtension, CUDAExtension
 
@@ -152,10 +151,10 @@ def main(debug: bool) -> None:
                 include_dirs=include_dir,
             ),
             CUDAExtension(
-                "drtk.kernel_splatting_ext",
+                "drtk.grid_scatter_ext",
                 sources=[
-                    "src/kernel_splatting/kernel_splatting_module.cpp",
-                    "src/kernel_splatting/kernel_splatting_kernel.cu",
+                    "src/grid_scatter/grid_scatter_module.cpp",
+                    "src/grid_scatter/grid_scatter_kernel.cu",
                 ],
                 extra_compile_args={"cxx": cxx_args[target_os], "nvcc": nvcc_args},
                 include_dirs=include_dir,

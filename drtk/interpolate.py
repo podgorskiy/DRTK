@@ -5,6 +5,7 @@
 # LICENSE file in the root directory of this source tree.
 
 import torch as th
+
 from drtk import interpolate_ext
 
 th.ops.load_library(interpolate_ext.__file__)

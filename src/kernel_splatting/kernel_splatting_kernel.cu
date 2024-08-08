@@ -58,7 +58,14 @@ __device__ void splat_bilinear(
     scalar_t ix,
     scalar_t iy,
     index_t input_sC,
-    index_t output_N_offset, index_t output_sC, index_t output_sH, index_t output_sW, index_t C, index_t H, index_t W, index_t memory_span){
+    index_t output_N_offset,
+    index_t output_sC,
+    index_t output_sH,
+    index_t output_sW,
+    index_t C,
+    index_t H,
+    index_t W,
+    index_t memory_span) {
   // get NE, NW, SE, SW pixel values from (x, y)
   auto ix_nw = static_cast<index_t>(::floor(ix));
   auto iy_nw = static_cast<index_t>(::floor(iy));
@@ -78,10 +85,50 @@ __device__ void splat_bilinear(
   //  Add to output pixel bilinear weighted source pixel value
   for (index_t c = 0; c < C; ++c) {
     scalar_t v = input_ptr[c * input_sC] * alpha;
-    safe_add_2d(output_ptr, iy_nw, ix_nw, output_sH, output_sW,  H, W, v * nw, output_N_offset + output_sC * c,  memory_span);
-    safe_add_2d(output_ptr, iy_ne, ix_ne, output_sH, output_sW,  H, W, v * ne, output_N_offset + output_sC * c,  memory_span);
-    safe_add_2d(output_ptr, iy_sw, ix_sw, output_sH, output_sW,  H, W, v * sw, output_N_offset + output_sC * c,  memory_span);
-    safe_add_2d(output_ptr, iy_se, ix_se, output_sH, output_sW,  H, W, v * se, output_N_offset + output_sC * c,  memory_span);
+    safe_add_2d(
+        output_ptr,
+        iy_nw,
+        ix_nw,
+        output_sH,
+        output_sW,
+        H,
+        W,
+        v * nw,
+        output_N_offset + output_sC * c,
+        memory_span);
+    safe_add_2d(
+        output_ptr,
+        iy_ne,
+        ix_ne,
+        output_sH,
+        output_sW,
+        H,
+        W,
+        v * ne,
+        output_N_offset + output_sC * c,
+        memory_span);
+    safe_add_2d(
+        output_ptr,
+        iy_sw,
+        ix_sw,
+        output_sH,
+        output_sW,
+        H,
+        W,
+        v * sw,
+        output_N_offset + output_sC * c,
+        memory_span);
+    safe_add_2d(
+        output_ptr,
+        iy_se,
+        ix_se,
+        output_sH,
+        output_sW,
+        H,
+        W,
+        v * se,
+        output_N_offset + output_sC * c,
+        memory_span);
   }
 }
 
@@ -118,8 +165,10 @@ __device__ TVec2<scalar_t> sample_bilinear_backward(
 
   // multipliers for gradients on ix and iy
   TVec2<scalar_t> gi_mult;
-  scalar_t ix = grid_sampler_compute_source_index_set_grad(x, inp_W, padding_mode, align_corners, &gi_mult.x);
-  scalar_t iy = grid_sampler_compute_source_index_set_grad(y, inp_H, padding_mode, align_corners, &gi_mult.y);
+  scalar_t ix =
+      grid_sampler_compute_source_index_set_grad(x, inp_W, padding_mode, align_corners, &gi_mult.x);
+  scalar_t iy =
+      grid_sampler_compute_source_index_set_grad(y, inp_H, padding_mode, align_corners, &gi_mult.y);
 
   // get NE, NW, SE, SW pixel values from (x, y)
   index_t ix_nw = static_cast<index_t>(::floor(ix));
@@ -141,18 +190,55 @@ __device__ TVec2<scalar_t> sample_bilinear_backward(
   scalar_t* gOut_ptr_NCHW = grad_output.data + n * gOut_sN + h * gOut_sH + w * gOut_sW;
   index_t NC_offset = n * gInp_sN;
   scalar_t* inp_ptr_NC = input.data + n * inp_sN;
-  for (index_t c = 0; c < C; ++c, inp_ptr_NC += inp_sC, NC_offset += gInp_sC, gOut_ptr_NCHW += gOut_sC) {
+  for (index_t c = 0; c < C;
+       ++c, inp_ptr_NC += inp_sC, NC_offset += gInp_sC, gOut_ptr_NCHW += gOut_sC) {
     scalar_t gOut = *gOut_ptr_NCHW * alpha;
 
     // calculate and set grad_input. See Note [Passing pointer and offset to fastAtomicAdd].
     safe_add_2d(
-        grad_input.data, iy_nw, ix_nw, gInp_sH, gInp_sW, inp_H, inp_W, nw * gOut, NC_offset, grad_input_memory_span);
+        grad_input.data,
+        iy_nw,
+        ix_nw,
+        gInp_sH,
+        gInp_sW,
+        inp_H,
+        inp_W,
+        nw * gOut,
+        NC_offset,
+        grad_input_memory_span);
     safe_add_2d(
-        grad_input.data, iy_ne, ix_ne, gInp_sH, gInp_sW, inp_H, inp_W, ne * gOut, NC_offset, grad_input_memory_span);
+        grad_input.data,
+        iy_ne,
+        ix_ne,
+        gInp_sH,
+        gInp_sW,
+        inp_H,
+        inp_W,
+        ne * gOut,
+        NC_offset,
+        grad_input_memory_span);
     safe_add_2d(
-        grad_input.data, iy_sw, ix_sw, gInp_sH, gInp_sW, inp_H, inp_W, sw * gOut, NC_offset, grad_input_memory_span);
+        grad_input.data,
+        iy_sw,
+        ix_sw,
+        gInp_sH,
+        gInp_sW,
+        inp_H,
+        inp_W,
+        sw * gOut,
+        NC_offset,
+        grad_input_memory_span);
     safe_add_2d(
-        grad_input.data, iy_se, ix_se, gInp_sH, gInp_sW, inp_H, inp_W, se * gOut, NC_offset, grad_input_memory_span);
+        grad_input.data,
+        iy_se,
+        ix_se,
+        gInp_sH,
+        gInp_sW,
+        inp_H,
+        inp_W,
+        se * gOut,
+        NC_offset,
+        grad_input_memory_span);
 
     // calculate grad_grid
     if (within_bounds_2d(iy_nw, ix_nw, inp_H, inp_W)) {
@@ -215,7 +301,8 @@ __global__ void kernel_splatting_kernel(
     const index_t n = index / (H * W);
 
     const scalar_t* __restrict input_ptr = input.data + n * input_sN + h * input_sH + w * input_sW;
-    const scalar_t* __restrict parameter_ptr = parameter.data + n * parameter_sN + h * parameter_sH + w * parameter_sW;
+    const scalar_t* __restrict parameter_ptr =
+        parameter.data + n * parameter_sN + h * parameter_sH + w * parameter_sW;
     scalar_t* __restrict output_ptr = output.data;
 
     if (kernel_type == Kernel::Disk) {
@@ -224,12 +311,27 @@ __global__ void kernel_splatting_kernel(
 
       for (int i = 0; i < num_samples; ++i) {
         const scalar_t sample_r = r * sqrt(scalar_t(i) / scalar_t(num_samples));
-        const scalar_t sample_a = uint_to_uniform_0_1_float(murmur_hash(index, seed)) + radical_inverse(i);
+        const scalar_t sample_a =
+            uint_to_uniform_0_1_float(murmur_hash(index, seed)) + radical_inverse(i);
 
         const scalar_t x = w + sample_r * cos(scalar_t(2) * scalar_t(3.1415) * sample_a);
         const scalar_t y = h + sample_r * sin(scalar_t(2) * scalar_t(3.1415) * sample_a);
         const scalar_t alpha = scalar_t(1) / scalar_t(num_samples);
-        splat_bilinear(input_ptr, output_ptr, alpha, x, y, input_sC, n * output_sN, output_sC, output_sH, output_sW, C, H, W, memory_span);
+        splat_bilinear(
+            input_ptr,
+            output_ptr,
+            alpha,
+            x,
+            y,
+            input_sC,
+            n * output_sN,
+            output_sC,
+            output_sH,
+            output_sW,
+            C,
+            H,
+            W,
+            memory_span);
       }
     }
   }
@@ -272,7 +374,8 @@ __global__ void kernel_splatting_backward_kernel(
   //    const index_t h = (index / out_W) % out_H;
   //    const index_t n = index / (out_H * out_W);
   //    const auto grid_offset = n * grid_sN + h * grid_sH + w * grid_sW;
-  //    const index_t vt_dxdy_img_offset = n * vt_dxdy_img_sN + h * vt_dxdy_img_sH + w * vt_dxdy_img_sW;
+  //    const index_t vt_dxdy_img_offset = n * vt_dxdy_img_sN + h * vt_dxdy_img_sH + w *
+  //    vt_dxdy_img_sW;
   //
   //    // get the corresponding input x, y co-ordinates from grid
   //    scalar_t u = grid.data[grid_offset];
@@ -284,8 +387,9 @@ __global__ void kernel_splatting_backward_kernel(
   //    scalar_t dudy = vt_dxdy_img.data[vt_dxdy_img_offset + vt_dxdy_img_s3];
   //    scalar_t dvdy = vt_dxdy_img.data[vt_dxdy_img_offset + vt_dxdy_img_s3 + vt_dxdy_img_s4];
   //
-  //    scalar_t px = pow(pow(abs(dudx * inp_W), 2.0f) + pow(abs(dvdx * inp_H), 2.0f) + 1e-12f, 0.5f);
-  //    scalar_t py = pow(pow(abs(dudy * inp_W), 2.0f) + pow(abs(dvdy * inp_H), 2.0f) + 1e-12f, 0.5f);
+  //    scalar_t px = pow(pow(abs(dudx * inp_W), 2.0f) + pow(abs(dvdx * inp_H), 2.0f) + 1e-12f,
+  //    0.5f); scalar_t py = pow(pow(abs(dudy * inp_W), 2.0f) + pow(abs(dvdy * inp_H), 2.0f) +
+  //    1e-12f, 0.5f);
   //
   //    scalar_t p_max = max(px, py);
   //    scalar_t p_min = min(px, py);
@@ -308,9 +412,11 @@ __global__ void kernel_splatting_backward_kernel(
   //    scalar_t l = min(lambda_, mipmaps - 1 - 1e-6);
   //
   //    // The following correction is divergence from the specification
-  //    // The reason is that it is typically assumed that the full pyramid is available, but if not,
+  //    // The reason is that it is typically assumed that the full pyramid is available, but if
+  //    not,
   //    // clipping of the level happens as in the line above, which causes taps to be spread with
-  //    // distances higher than the size of the texel. Which in turn causes aliasing and not desirable
+  //    // distances higher than the size of the texel. Which in turn causes aliasing and not
+  //    desirable
   //    // long-range sampling So if clipping happens, we recompute clipped Pmax and scale gradients
   //    // accordingly
   //    if (clip_grad && lambda_ > mipmaps - 1) {
@@ -498,8 +604,10 @@ __global__ void kernel_splatting_backward_kernel(
   //  }
 }
 
-__host__ torch::Tensor
-kernel_splatting_cuda(const torch::Tensor& input, const torch::Tensor& parameter, int64_t kernel_type) {
+__host__ torch::Tensor kernel_splatting_cuda(
+    const torch::Tensor& input,
+    const torch::Tensor& parameter,
+    int64_t kernel_type) {
   TORCH_CHECK(
       input.defined() && parameter.defined(),
       "kernel_splatting(): expected input and parameter to not be undefined, but input is ",
@@ -697,7 +805,10 @@ __host__ void dispatch_kernel_type_kernel_splatting_backward_kernel(
           input_requires_grad,
           parameter_requires_grad);
     case Kernel::RadialGaussian:
-      dispatch_requires_grad_kernel_splatting_backward_kernel<scalar_t, index_t, Kernel::RadialGaussian>(
+      dispatch_requires_grad_kernel_splatting_backward_kernel<
+          scalar_t,
+          index_t,
+          Kernel::RadialGaussian>(
           count,
           grad_output,
           input,

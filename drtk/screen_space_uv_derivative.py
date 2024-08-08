@@ -9,7 +9,6 @@ from typing import Optional, Sequence
 import torch as th
 
 from drtk.interpolate import interpolate
-
 from drtk.utils import face_dpdt, project_points_grad
 
 

@@ -8,8 +8,9 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import torch as th
 import torch.nn.functional as thf
-from drtk.utils.indexing import index
 from torch import Tensor
+
+from drtk.utils.indexing import index
 
 eps = 1e-8
 

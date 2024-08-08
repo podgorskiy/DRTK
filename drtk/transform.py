@@ -7,6 +7,7 @@
 from typing import Optional, Sequence, Tuple
 
 import torch as th
+
 from drtk.utils import project_points
 
 

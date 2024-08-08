@@ -13,15 +13,15 @@ th.ops.load_library(kernel_splatting_ext.__file__)
 
 @th.compiler.disable
 def kernel_splatting(
-        input: th.Tensor,
-        parameter: th.Tensor,
-        kernel_type: str = "disk",
-        mode: str = "bilinear",
+    input: th.Tensor,
+    parameter: th.Tensor,
+    kernel_type: str = "disk",
+    mode: str = "bilinear",
 ) -> th.Tensor:
     if mode != "bilinear" and mode != "nearest":
         raise ValueError(
-                "kernel_splatting(): only 'bilinear' and 'nearest' modes are supported "
-                "but got: '{}'".format(mode)
+            "kernel_splatting(): only 'bilinear' and 'nearest' modes are supported "
+            "but got: '{}'".format(mode)
         )
 
     if mode == "bilinear":
@@ -33,8 +33,8 @@ def kernel_splatting(
 
     if kernel_type != "disk" and kernel_type != "gaussian":
         raise ValueError(
-                "kernel_splatting(): only 'disk' and 'gaussian' kernel types are supported "
-                "but got: '{}'".format(kernel_type)
+            "kernel_splatting(): only 'disk' and 'gaussian' kernel types are supported "
+            "but got: '{}'".format(kernel_type)
         )
 
     if kernel_type == "disk":
@@ -45,7 +45,7 @@ def kernel_splatting(
         kernel_type_enum = 3
 
     return th.ops.kernel_splatting_ext.kernel_splatting(
-            input,
-            parameter,
-            kernel_type_enum,
+        input,
+        parameter,
+        kernel_type_enum,
     )

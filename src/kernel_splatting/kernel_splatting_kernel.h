@@ -7,7 +7,10 @@
 #pragma once
 #include <torch/torch.h>
 
-torch::Tensor kernel_splatting_cuda(const torch::Tensor& input, const torch::Tensor& parameter, int64_t kernel_type);
+torch::Tensor kernel_splatting_cuda(
+    const torch::Tensor& input,
+    const torch::Tensor& parameter,
+    int64_t kernel_type);
 
 std::tuple<torch::Tensor, torch::Tensor> kernel_splatting_cuda_backward(
     const torch::Tensor& grad_output,

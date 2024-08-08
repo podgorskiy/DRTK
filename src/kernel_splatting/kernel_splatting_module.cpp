@@ -15,7 +15,8 @@
 #include "kernel_splatting_kernel.h"
 
 // Dispatch function
-torch::Tensor kernel_splatting(const torch::Tensor& input, const torch::Tensor& parameter, int64_t kernel_type) {
+torch::Tensor
+kernel_splatting(const torch::Tensor& input, const torch::Tensor& parameter, int64_t kernel_type) {
   static auto op = torch::Dispatcher::singleton()
                        .findSchemaOrThrow("kernel_splatting_ext::kernel_splatting", "")
                        .typed<decltype(kernel_splatting)>();
@@ -38,7 +39,8 @@ class KernelSplattingFunction : public torch::autograd::Function<KernelSplatting
     ctx->save_for_backward(save_list);
     bool input_requires_grad = input.requires_grad();
     bool parameter_requires_grad = parameter.requires_grad();
-    ctx->saved_data["data"] = std::make_tuple(input_requires_grad, parameter_requires_grad, kernel_type);
+    ctx->saved_data["data"] =
+        std::make_tuple(input_requires_grad, parameter_requires_grad, kernel_type);
     auto out = kernel_splatting_cuda(input, parameter, kernel_type);
     return {out};
   }
@@ -66,13 +68,17 @@ class KernelSplattingFunction : public torch::autograd::Function<KernelSplatting
   }
 };
 
-torch::Tensor
-kernel_splatting_autograd(const torch::Tensor& input, const torch::Tensor& parameter, int64_t kernel_type) {
+torch::Tensor kernel_splatting_autograd(
+    const torch::Tensor& input,
+    const torch::Tensor& parameter,
+    int64_t kernel_type) {
   return KernelSplattingFunction::apply(input, parameter, kernel_type)[0];
 }
 
-torch::Tensor
-kernel_splatting_autocast(const torch::Tensor& input, const torch::Tensor& parameter, int64_t kernel_type) {
+torch::Tensor kernel_splatting_autocast(
+    const torch::Tensor& input,
+    const torch::Tensor& parameter,
+    int64_t kernel_type) {
   c10::impl::ExcludeDispatchKeyGuard no_autocast(c10::DispatchKey::Autocast);
   return kernel_splatting(
       at::autocast::cached_cast(torch::kFloat32, input),
