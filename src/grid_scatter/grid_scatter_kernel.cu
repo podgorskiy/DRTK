@@ -114,6 +114,164 @@ __device__ void scatter_bilinear(
 }
 
 template <typename scalar_t, typename index_t>
+__device__ void upsampling_scatter_bilinear(
+    const TensorInfoCompact<scalar_t, index_t, tex_ndim>& input,
+    const TensorInfoCompact<scalar_t, index_t, tex_ndim>& grid,
+    const TensorInfoCompact<scalar_t, index_t, tex_ndim>& output,
+    scalar_t x_src,
+    scalar_t y_src,
+    const index_t n,
+    const index_t C,
+    scalar_t alpha,
+    const GridSamplerPadding padding_mode,
+    bool align_corners,
+    index_t output_memory_span) {
+  index_t input_H = input.sizes[2];
+  index_t input_W = input.sizes[3];
+  index_t input_sN = input.strides[0];
+  index_t input_sC = input.strides[1];
+  index_t input_sH = input.strides[2];
+  index_t input_sW = input.strides[3];
+  index_t grid_sN = grid.strides[0];
+  index_t grid_sH = grid.strides[1];
+  index_t grid_sW = grid.strides[2];
+  index_t grid_sC = grid.strides[3];
+  index_t output_sN = output.strides[0];
+  index_t output_sC = output.strides[1];
+  index_t output_sH = output.strides[2];
+  index_t output_sW = output.strides[3];
+
+  index_t output_H = output.sizes[2];
+  index_t output_W = output.sizes[3];
+
+  scalar_t ix_src = grid_sampler_compute_source_index(x_src, input_W, GridSamplerPadding::Border, align_corners);
+  scalar_t iy_src = grid_sampler_compute_source_index(y_src, input_H, GridSamplerPadding::Border, align_corners);
+
+  // get NE, NW, SE, SW pixel values from (x, y)
+  index_t ix_nw_src = static_cast<index_t>(::floor(ix_src));
+  index_t iy_nw_src = static_cast<index_t>(::floor(iy_src));
+  index_t ix_ne_src = ix_nw_src + 1;
+  index_t iy_ne_src = iy_nw_src;
+  index_t ix_sw_src = ix_nw_src;
+  index_t iy_sw_src = iy_nw_src + 1;
+  index_t ix_se_src = ix_nw_src + 1;
+  index_t iy_se_src = iy_nw_src + 1;
+
+  // get surfaces to each neighbor:
+  scalar_t nw_src = (ix_se_src - ix_src) * (iy_se_src - iy_src);
+  scalar_t ne_src = (ix_src - ix_sw_src) * (iy_sw_src - iy_src);
+  scalar_t sw_src = (ix_ne_src - ix_src) * (iy_src - iy_ne_src);
+  scalar_t se_src = (ix_src - ix_nw_src) * (iy_src - iy_nw_src);
+
+  const scalar_t* grid_ptr_N = grid.data + n * grid_sN;
+  scalar_t x_dst = 0;
+  scalar_t y_dst = 0;
+  if (within_bounds_2d(iy_nw_src, ix_nw_src, input_H, input_W)) {
+    x_dst += grid_ptr_N[iy_nw_src * grid_sH + ix_nw_src * grid_sW + 0 * grid_sC] * nw_src;
+    y_dst += grid_ptr_N[iy_nw_src * grid_sH + ix_nw_src * grid_sW + 1 * grid_sC] * nw_src;
+  }
+  if (within_bounds_2d(iy_ne_src, ix_ne_src, input_H, input_W)) {
+    x_dst += grid_ptr_N[iy_ne_src * grid_sH + ix_ne_src * grid_sW + 0 * grid_sC] * ne_src;
+    y_dst += grid_ptr_N[iy_ne_src * grid_sH + ix_ne_src * grid_sW + 1 * grid_sC] * ne_src;
+  }
+  if (within_bounds_2d(iy_sw_src, ix_sw_src, input_H, input_W)) {
+    x_dst += grid_ptr_N[iy_sw_src * grid_sH + ix_sw_src * grid_sW + 0 * grid_sC] * sw_src;
+    y_dst += grid_ptr_N[iy_sw_src * grid_sH + ix_sw_src * grid_sW + 1 * grid_sC] * sw_src;
+  }
+  if (within_bounds_2d(iy_se_src, ix_se_src, input_H, input_W)) {
+    x_dst += grid_ptr_N[iy_se_src * grid_sH + ix_se_src * grid_sW + 0 * grid_sC] * se_src;
+    y_dst += grid_ptr_N[iy_se_src * grid_sH + ix_se_src * grid_sW + 1 * grid_sC] * se_src;
+  }
+
+  scalar_t ix_dst = grid_sampler_compute_source_index(x_dst, output_W, padding_mode, align_corners);
+  scalar_t iy_dst = grid_sampler_compute_source_index(y_dst, output_H, padding_mode, align_corners);
+
+  //   printf("x_src: %f y_src %f ix_src %d iy_src %d x_dst: %f y_dst %f ix_dst %d iy_dst %d\n", x_src, y_src, int(ix_src), int(iy_src), x_dst, y_dst, int(ix_dst), int(iy_dst));
+
+  // get NE, NW, SE, SW pixel values from (x, y)
+  index_t ix_nw_dst = static_cast<index_t>(::floor(ix_dst));
+  index_t iy_nw_dst = static_cast<index_t>(::floor(iy_dst));
+  index_t ix_ne_dst = ix_nw_dst + 1;
+  index_t iy_ne_dst = iy_nw_dst;
+  index_t ix_sw_dst = ix_nw_dst;
+  index_t iy_sw_dst = iy_nw_dst + 1;
+  index_t ix_se_dst = ix_nw_dst + 1;
+  index_t iy_se_dst = iy_nw_dst + 1;
+
+  // get surfaces to each neighbor:
+  scalar_t nw_dst = (ix_se_dst - ix_dst) * (iy_se_dst - iy_dst);
+  scalar_t ne_dst = (ix_dst - ix_sw_dst) * (iy_sw_dst - iy_dst);
+  scalar_t sw_dst = (ix_ne_dst - ix_dst) * (iy_dst - iy_ne_dst);
+  scalar_t se_dst = (ix_dst - ix_nw_dst) * (iy_dst - iy_nw_dst);
+
+  const scalar_t* input_ptr_NC = input.data + n * input_sN;
+  index_t NC_offset = n * output_sN;
+  for (index_t c = 0; c < C; ++c, NC_offset += output_sC, input_ptr_NC += input_sC) {
+    scalar_t input_value = scalar_t(0.);
+    if (within_bounds_2d(iy_nw_src, ix_nw_src, input_H, input_W)) {
+      input_value += input_ptr_NC[iy_nw_src * input_sH + ix_nw_src * input_sW] * nw_src;
+    }
+    if (within_bounds_2d(iy_ne_src, ix_ne_src, input_H, input_W)) {
+      input_value += input_ptr_NC[iy_ne_src * input_sH + ix_ne_src * input_sW] * ne_src;
+    }
+    if (within_bounds_2d(iy_sw_src, ix_sw_src, input_H, input_W)) {
+      input_value += input_ptr_NC[iy_sw_src * input_sH + ix_sw_src * input_sW] * sw_src;
+    }
+    if (within_bounds_2d(iy_se_src, ix_se_src, input_H, input_W)) {
+      input_value += input_ptr_NC[iy_se_src * input_sH + ix_se_src * input_sW] * se_src;
+    }
+
+    input_value *= alpha;
+
+    // calculate and set grad_input. See Note [Passing pointer and offset to fastAtomicAdd].
+    safe_add_2d(
+        output.data,
+        iy_nw_dst,
+        ix_nw_dst,
+        output_sH,
+        output_sW,
+        output_H,
+        output_W,
+        nw_dst * input_value,
+        NC_offset,
+        output_memory_span);
+    safe_add_2d(
+        output.data,
+        iy_ne_dst,
+        ix_ne_dst,
+        output_sH,
+        output_sW,
+        output_H,
+        output_W,
+        ne_dst * input_value,
+        NC_offset,
+        output_memory_span);
+    safe_add_2d(
+        output.data,
+        iy_sw_dst,
+        ix_sw_dst,
+        output_sH,
+        output_sW,
+        output_H,
+        output_W,
+        sw_dst * input_value,
+        NC_offset,
+        output_memory_span);
+    safe_add_2d(
+        output.data,
+        iy_se_dst,
+        ix_se_dst,
+        output_sH,
+        output_sW,
+        output_H,
+        output_W,
+        se_dst * input_value,
+        NC_offset,
+        output_memory_span);
+  }
+}
+
+template <typename scalar_t, typename index_t>
 __device__ void scatter_bicubic(
     const TensorInfoCompact<scalar_t, index_t, tex_ndim>& input,
     const TensorInfoCompact<scalar_t, index_t, tex_ndim>& output,
@@ -180,6 +338,194 @@ __device__ void scatter_bicubic(
     }
   }
 }
+
+
+template <typename scalar_t, typename index_t>
+__device__ void upsampling_scatter_bicubic(
+    const TensorInfoCompact<scalar_t, index_t, tex_ndim>& input,
+    const TensorInfoCompact<scalar_t, index_t, tex_ndim>& grid,
+    const TensorInfoCompact<scalar_t, index_t, tex_ndim>& output,
+    scalar_t x_src,
+    scalar_t y_src,
+    const index_t n,
+    const index_t C,
+    scalar_t alpha,
+    const GridSamplerPadding padding_mode,
+    bool align_corners,
+    index_t output_memory_span) {
+  index_t input_H = input.sizes[2];
+  index_t input_W = input.sizes[3];
+  index_t input_sN = input.strides[0];
+  index_t input_sC = input.strides[1];
+  index_t input_sH = input.strides[2];
+  index_t input_sW = input.strides[3];
+  index_t grid_sN = grid.strides[0];
+  index_t grid_sH = grid.strides[1];
+  index_t grid_sW = grid.strides[2];
+  index_t grid_sC = grid.strides[3];
+  index_t output_sN = output.strides[0];
+  index_t output_sC = output.strides[1];
+  index_t output_sH = output.strides[2];
+  index_t output_sW = output.strides[3];
+
+  index_t output_H = output.sizes[2];
+  index_t output_W = output.sizes[3];
+
+  scalar_t ix_src = grid_sampler_compute_source_index(x_src, input_W, GridSamplerPadding::Border, align_corners);
+  scalar_t iy_src = grid_sampler_compute_source_index(y_src, input_H, GridSamplerPadding::Border, align_corners);
+
+  scalar_t ix_nw_src = static_cast<index_t>(::floor(ix_src));
+  scalar_t iy_nw_src = static_cast<index_t>(::floor(iy_src));
+
+  const scalar_t tx_src = ix_src - ix_nw_src;
+  const scalar_t ty_src = iy_src - iy_nw_src;
+
+  scalar_t xy_dst[2] = {0, 0};
+  const scalar_t* grid_ptr_NC = grid.data + n * grid_sN;
+  for (index_t c = 0; c < C; ++c, grid_ptr_NC += grid_sC) {
+    scalar_t coefficients[4];
+#pragma unroll 4
+    for (index_t i = 0; i < 4; ++i) {
+      coefficients[i] = cubic_interp1d(
+          get_value_bounded<scalar_t>(
+              grid_ptr_NC,
+              ix_nw_src - 1,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              grid_sW,
+              grid_sH,
+              padding_mode,
+              align_corners),
+          get_value_bounded<scalar_t>(
+              grid_ptr_NC,
+              ix_nw_src + 0,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              grid_sW,
+              grid_sH,
+              padding_mode,
+              align_corners),
+          get_value_bounded<scalar_t>(
+              grid_ptr_NC,
+              ix_nw_src + 1,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              grid_sW,
+              grid_sH,
+              padding_mode,
+              align_corners),
+          get_value_bounded<scalar_t>(
+              grid_ptr_NC,
+              ix_nw_src + 2,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              grid_sW,
+              grid_sH,
+              padding_mode,
+              align_corners),
+          tx_src);
+    }
+
+    xy_dst[c] =
+        cubic_interp1d(coefficients[0], coefficients[1], coefficients[2], coefficients[3], ty_src);
+  }
+  scalar_t x_dst = xy_dst[0];
+  scalar_t y_dst = xy_dst[1];
+
+  scalar_t ix_dst = grid_sampler_compute_source_index(x_dst, output_W, padding_mode, align_corners);
+  scalar_t iy_dst = grid_sampler_compute_source_index(y_dst, output_H, padding_mode, align_corners);
+  scalar_t ix_nw_dst = static_cast<index_t>(::floor(ix_dst));
+  scalar_t iy_nw_dst = static_cast<index_t>(::floor(iy_dst));
+  const scalar_t tx_dst = ix_dst - ix_nw_dst;
+  const scalar_t ty_dst = iy_dst - iy_nw_dst;
+
+  scalar_t x_coeffs[4];
+  scalar_t y_coeffs[4];
+
+  get_cubic_upsampling_coefficients<scalar_t>(x_coeffs, tx_dst);
+  get_cubic_upsampling_coefficients<scalar_t>(y_coeffs, ty_dst);
+
+  index_t NC_offset = n * output_sN;
+  const scalar_t* input_ptr_NC = input.data + n * input_sN;
+  for (index_t c = 0; c < C; ++c, NC_offset += output_sC, input_ptr_NC += input_sC) {
+    scalar_t coefficients[4];
+#pragma unroll 4
+    for (index_t i = 0; i < 4; ++i) {
+      coefficients[i] = cubic_interp1d(
+          get_value_bounded<scalar_t>(
+              input_ptr_NC,
+              ix_nw_src - 1,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              input_sW,
+              input_sH,
+              padding_mode,
+              align_corners),
+          get_value_bounded<scalar_t>(
+              input_ptr_NC,
+              ix_nw_src + 0,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              input_sW,
+              input_sH,
+              padding_mode,
+              align_corners),
+          get_value_bounded<scalar_t>(
+              input_ptr_NC,
+              ix_nw_src + 1,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              input_sW,
+              input_sH,
+              padding_mode,
+              align_corners),
+          get_value_bounded<scalar_t>(
+              input_ptr_NC,
+              ix_nw_src + 2,
+              iy_nw_src - 1 + i,
+              input_W,
+              input_H,
+              input_sW,
+              input_sH,
+              padding_mode,
+              align_corners),
+          tx_src);
+    }
+
+    scalar_t input_value = cubic_interp1d(coefficients[0], coefficients[1], coefficients[2], coefficients[3], ty_src);
+
+    input_value *= alpha;
+
+#pragma unroll 4
+    for (index_t i = 0; i < 4; ++i) {
+#pragma unroll 4
+      for (index_t j = 0; j < 4; ++j) {
+        // set input gradient. See Note [Passing pointer and offset to fastAtomicAdd].
+        add_value_bounded<scalar_t>(
+            output.data,
+            ix_nw_dst - 1 + i,
+            iy_nw_dst - 1 + j,
+            output_W,
+            output_H,
+            output_sW,
+            output_sH,
+            input_value * x_coeffs[i] * y_coeffs[j],
+            padding_mode,
+            align_corners,
+            NC_offset,
+            output_memory_span);
+      }
+    }
+  }
+}
+
 
 template <typename scalar_t, typename index_t, bool grid_requires_grad, bool input_requires_grad>
 __device__ TVec2<scalar_t> scatter_bilinear_backward(
@@ -422,19 +768,26 @@ __device__ TVec2<scalar_t> scatter_bicubic_backward(
   return gi_mult * gi;
 }
 
-template <typename scalar_t, typename index_t, GridSamplerInterpolation interpolation_mode>
+template <typename scalar_t, typename index_t, GridSamplerInterpolation interpolation_mode, bool upsampling>
 C10_LAUNCH_BOUNDS_1(256)
 __global__ void grid_scatter_2d_kernel(
     const index_t nthreads,
     TensorInfoCompact<scalar_t, index_t, tex_ndim> input,
     TensorInfoCompact<scalar_t, index_t, tex_ndim> grid,
     TensorInfoCompact<scalar_t, index_t, tex_ndim> output,
+    int upsampling_factor,
     const GridSamplerPadding padding_mode,
     bool align_corners,
     index_t output_memory_span) {
   index_t C = output.sizes[1];
   index_t inp_H = input.sizes[2];
   index_t inp_W = input.sizes[3];
+
+  if (upsampling)
+  {
+    inp_H *= upsampling_factor;
+    inp_W *= upsampling_factor;
+  }
 
   index_t grid_sN = grid.strides[0];
   index_t grid_sH = grid.strides[1];
@@ -445,17 +798,35 @@ __global__ void grid_scatter_2d_kernel(
     const index_t w = index % inp_W;
     const index_t h = (index / inp_W) % inp_H;
     const index_t n = index / (inp_H * inp_W);
-    const index_t grid_offset = n * grid_sN + h * grid_sH + w * grid_sW;
 
-    // get the corresponding input x, y co-ordinates from grid
-    scalar_t u = grid.data[grid_offset];
-    scalar_t v = grid.data[grid_offset + grid_sCoor];
-    if (interpolation_mode == GridSamplerInterpolation::Bilinear) {
-      scatter_bilinear(
-          input, output, u, v, w, h, n, C, padding_mode, align_corners, output_memory_span);
-    } else if (interpolation_mode == GridSamplerInterpolation::Bicubic) {
-      scatter_bicubic(
-          input, output, u, v, w, h, n, C, padding_mode, align_corners, output_memory_span);
+    if (upsampling) {
+      // compute normalized src coordinates from index
+      scalar_t u_src = grid_sampler_normalize(scalar_t(w), inp_W, align_corners);
+      scalar_t v_src = grid_sampler_normalize(scalar_t(h), inp_H, align_corners);
+
+      scalar_t alpha = scalar_t(1.) / (scalar_t(upsampling_factor) * scalar_t(upsampling_factor));
+
+      if (interpolation_mode == GridSamplerInterpolation::Bilinear) {
+        upsampling_scatter_bilinear(
+            input, grid, output, u_src, v_src, n, C, alpha, padding_mode, align_corners, output_memory_span);
+      } else if (interpolation_mode == GridSamplerInterpolation::Bicubic) {
+        upsampling_scatter_bicubic(
+            input, grid, output, u_src, v_src, n, C, alpha, padding_mode, align_corners, output_memory_span);
+      }
+    }else{
+      const index_t grid_offset = n * grid_sN + h * grid_sH + w * grid_sW;
+
+      // get the corresponding input x, y co-ordinates from grid
+      scalar_t u = grid.data[grid_offset];
+      scalar_t v = grid.data[grid_offset + grid_sCoor];
+
+      if (interpolation_mode == GridSamplerInterpolation::Bilinear) {
+        scatter_bilinear(
+            input, output, u, v, w, h, n, C, padding_mode, align_corners, output_memory_span);
+      } else if (interpolation_mode == GridSamplerInterpolation::Bicubic) {
+        scatter_bicubic(
+            input, output, u, v, w, h, n, C, padding_mode, align_corners, output_memory_span);
+      }
     }
   }
 }
@@ -518,27 +889,50 @@ __global__ void grid_scatter_2d_backward_kernel(
   }
 }
 
-template <typename scalar_t, typename index_t>
+template <typename scalar_t, typename index_t, bool upsampling>
 __host__ void grid_scatter_2d_dispatch_interpolation_type(
     const index_t nthreads,
     TensorInfoCompact<scalar_t, index_t, tex_ndim> input,
     TensorInfoCompact<scalar_t, index_t, tex_ndim> grid,
     TensorInfoCompact<scalar_t, index_t, tex_ndim> output,
+    int upsampling_factor,
     const GridSamplerPadding padding_mode,
     bool align_corners,
     GridSamplerInterpolation interpolation_mode,
     index_t output_memory_span) {
   if (interpolation_mode == GridSamplerInterpolation::Bilinear) {
-    grid_scatter_2d_kernel<scalar_t, index_t, GridSamplerInterpolation::Bilinear>
+    grid_scatter_2d_kernel<scalar_t, index_t, GridSamplerInterpolation::Bilinear, upsampling>
         <<<GET_BLOCKS(nthreads, 256), 256, 0, at::cuda::getCurrentCUDAStream()>>>(
-            nthreads, input, grid, output, padding_mode, align_corners, output_memory_span);
+            nthreads, input, grid, output, upsampling_factor, padding_mode, align_corners, output_memory_span);
   } else if (interpolation_mode == GridSamplerInterpolation::Bicubic) {
-    grid_scatter_2d_kernel<scalar_t, index_t, GridSamplerInterpolation::Bicubic>
+    grid_scatter_2d_kernel<scalar_t, index_t, GridSamplerInterpolation::Bicubic, upsampling>
         <<<GET_BLOCKS(nthreads, 256), 256, 0, at::cuda::getCurrentCUDAStream()>>>(
-            nthreads, input, grid, output, padding_mode, align_corners, output_memory_span);
+            nthreads, input, grid, output, upsampling_factor, padding_mode, align_corners, output_memory_span);
   }
   C10_CUDA_KERNEL_LAUNCH_CHECK();
 }
+
+
+template <typename scalar_t, typename index_t>
+__host__ void grid_scatter_2d_dispatch_upsampling(
+    const index_t nthreads,
+    TensorInfoCompact<scalar_t, index_t, tex_ndim> input,
+    TensorInfoCompact<scalar_t, index_t, tex_ndim> grid,
+    TensorInfoCompact<scalar_t, index_t, tex_ndim> output,
+    int upsampling_factor,
+    const GridSamplerPadding padding_mode,
+    bool align_corners,
+    GridSamplerInterpolation interpolation_mode,
+    index_t output_memory_span) {
+  if (upsampling_factor == 1) {
+    grid_scatter_2d_dispatch_interpolation_type<scalar_t, index_t, false>(
+            nthreads, input, grid, output, upsampling_factor, padding_mode, align_corners, interpolation_mode, output_memory_span);
+  } else {
+    grid_scatter_2d_dispatch_interpolation_type<scalar_t, index_t, true>(
+            nthreads, input, grid, output, upsampling_factor, padding_mode, align_corners, interpolation_mode, output_memory_span);
+  }
+}
+
 
 template <typename scalar_t, typename index_t, bool grid_requires_grad, bool input_requires_grad>
 __host__ void grid_scatter_2d_backward_dispatch_interpolation_type(
@@ -627,6 +1021,7 @@ __host__ torch::Tensor grid_scatter_2d_cuda(
     const torch::Tensor& grid,
     int64_t output_height,
     int64_t output_width,
+    int64_t upsampling_factor,
     int64_t padding_mode,
     int64_t interpolation_mode,
     bool align_corners) {
@@ -645,6 +1040,12 @@ __host__ torch::Tensor grid_scatter_2d_cuda(
       output_height,
       " and output_width is ",
       output_width);
+
+  TORCH_CHECK(
+      upsampling_factor > 0,
+      "grid_scatter(): expected upsampling_factor to be greater than 0, but upsampling_factor is ",
+      upsampling_factor);
+
   TORCH_CHECK(
       input_opt.device() == grid_opt.device() && grid_opt.device().is_cuda(),
       "grid_scatter(): expected input and grid to be on same CUDA device, but input is on ",
@@ -693,7 +1094,7 @@ __host__ torch::Tensor grid_scatter_2d_cuda(
   auto H = grid.size(1);
   auto W = grid.size(2);
   auto output = at::zeros({N, C, output_height, output_width}, input.options());
-  int64_t count = N * H * W;
+  int64_t count = N * H * W * upsampling_factor * upsampling_factor;
 
   if (count > 0) {
     // Should be AT_DISPATCH_FLOATING_TYPES_AND_HALF, but half is broken on prod
@@ -702,11 +1103,12 @@ __host__ torch::Tensor grid_scatter_2d_cuda(
           at::native::canUse32BitIndexMath(output)) {
         typedef int index_type;
 
-        grid_scatter_2d_dispatch_interpolation_type<scalar_t, index_type>(
+        grid_scatter_2d_dispatch_upsampling<scalar_t, index_type>(
             static_cast<index_type>(count),
             getTensorInfoCompact<scalar_t, index_type, tex_ndim>(input),
             getTensorInfoCompact<scalar_t, index_type, tex_ndim>(grid),
             getTensorInfoCompact<scalar_t, index_type, tex_ndim>(output),
+            int(upsampling_factor),
             static_cast<GridSamplerPadding>(padding_mode),
             align_corners,
             static_cast<GridSamplerInterpolation>(interpolation_mode),
@@ -714,11 +1116,12 @@ __host__ torch::Tensor grid_scatter_2d_cuda(
       } else {
         typedef int64_t index_type;
 
-        grid_scatter_2d_dispatch_interpolation_type<scalar_t, index_type>(
+        grid_scatter_2d_dispatch_upsampling<scalar_t, index_type>(
             static_cast<index_type>(count),
             getTensorInfoCompact<scalar_t, index_type, tex_ndim>(input),
             getTensorInfoCompact<scalar_t, index_type, tex_ndim>(grid),
             getTensorInfoCompact<scalar_t, index_type, tex_ndim>(output),
+            int(upsampling_factor),
             static_cast<GridSamplerPadding>(padding_mode),
             align_corners,
             static_cast<GridSamplerInterpolation>(interpolation_mode),

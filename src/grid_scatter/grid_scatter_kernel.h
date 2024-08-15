@@ -12,6 +12,7 @@ torch::Tensor grid_scatter_2d_cuda(
     const torch::Tensor& grid,
     int64_t output_height,
     int64_t output_width,
+    int64_t upsampling_factor,
     int64_t padding_mode,
     int64_t interpolation_mode,
     bool align_corners);

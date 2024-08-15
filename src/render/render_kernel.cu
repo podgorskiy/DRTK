@@ -17,7 +17,7 @@ using namespace math;
 
 using at::native::fastAtomicAdd;
 
-template <typename scalar_t, typename index_t>
+template <typename scalar_t, typename index_t, bool return_bary_derivative>
 C10_LAUNCH_BOUNDS_1(256)
 __global__ void render_kernel(
     const index_t nthreads,
@@ -25,7 +25,8 @@ __global__ void render_kernel(
     TensorInfo<int32_t, index_t> vi,
     TensorInfo<int32_t, index_t> index_img,
     TensorInfo<scalar_t, index_t> depth_img,
-    TensorInfo<scalar_t, index_t> bary_img) {
+    TensorInfo<scalar_t, index_t> bary_img,
+    TensorInfo<scalar_t, index_t> bary_dxdy_img) {
   typedef typename math::TVec2<scalar_t> scalar2_t;
   typedef typename math::TVec3<scalar_t> scalar3_t;
 
@@ -53,6 +54,12 @@ __global__ void render_kernel(
   const index_t bary_img_sH = bary_img.strides[2];
   const index_t bary_img_sW = bary_img.strides[3];
 
+  const index_t bary_dxdy_img_sN = bary_dxdy_img.strides[0];
+  const index_t bary_dxdy_img_sB = bary_dxdy_img.strides[1];
+  const index_t bary_dxdy_img_sH = bary_dxdy_img.strides[2];
+  const index_t bary_dxdy_img_sW = bary_dxdy_img.strides[3];
+  const index_t bary_dxdy_img_sC = bary_dxdy_img.strides[4];
+
   CUDA_KERNEL_LOOP_TYPE(index, nthreads, index_t) {
     const index_t w = index % W;
     const index_t h = (index / W) % H;
@@ -61,6 +68,8 @@ __global__ void render_kernel(
     const int32_t tr_index = index_img.data[n * index_img_sN + h * index_img_sH + w * index_img_sW];
     scalar_t* __restrict bary_img_ptr =
         bary_img.data + bary_img_sN * n + bary_img_sH * h + bary_img_sW * w;
+    scalar_t* __restrict bary_dxdy_img_ptr =
+        bary_dxdy_img.data + bary_dxdy_img_sN * n + bary_dxdy_img_sH * h + bary_dxdy_img_sW * w;
     scalar_t* __restrict depth_img_ptr =
         depth_img.data + depth_img_sN * n + depth_img_sH * h + depth_img_sW * w;
 
@@ -92,6 +101,7 @@ __global__ void render_kernel(
           (vp0p.x * v_02.y - vp0p.y * v_02.x),
           (vp0p.y * v_01.x - vp0p.x * v_01.y),
       };
+
       const scalar2_t bary_12 = bary_12_pre / denominator;
       scalar3_t bary = {scalar_t(1.0) - bary_12.x - bary_12.y, bary_12.x, bary_12.y};
 
@@ -106,7 +116,36 @@ __global__ void render_kernel(
       bary_img_ptr[bary_img_sB * 1] = bary_3D.y;
       bary_img_ptr[bary_img_sB * 2] = bary_3D.z;
       *depth_img_ptr = depth;
+
+      if (return_bary_derivative) {
+        const scalar2_t bary_12_dx = scalar2_t{v_02.y, -v_01.y} / denominator;
+        const scalar2_t bary_12_dy = scalar2_t{-v_02.x, v_01.x} / denominator;
+        const scalar3_t bary_dx =
+            scalar3_t{-bary_12_dx.x - bary_12_dx.y, bary_12_dx.x, bary_12_dx.y};
+        const scalar3_t bary_dy =
+            scalar3_t{-bary_12_dy.x - bary_12_dy.y, bary_12_dy.x, bary_12_dy.y};
+
+        const scalar_t depth_dx = -depth * depth * dot(d_inv, bary_dx);
+        const scalar_t depth_dy = -depth * depth * dot(d_inv, bary_dy);
+
+        const scalar3_t bary_3D_dx = d_inv * (bary_dx * depth + bary * depth_dx);
+        const scalar3_t bary_3D_dy = d_inv * (bary_dy * depth + bary * depth_dy);
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 0 + bary_dxdy_img_sC * 0] = bary_3D_dx.x;
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 1 + bary_dxdy_img_sC * 0] = bary_3D_dx.y;
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 2 + bary_dxdy_img_sC * 0] = bary_3D_dx.z;
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 0 + bary_dxdy_img_sC * 1] = bary_3D_dy.x;
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 1 + bary_dxdy_img_sC * 1] = bary_3D_dy.y;
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 2 + bary_dxdy_img_sC * 1] = bary_3D_dy.z;
+      }
     } else {
+      if (return_bary_derivative) {
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 0 + bary_dxdy_img_sC * 0] = scalar_t(0);
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 1 + bary_dxdy_img_sC * 0] = scalar_t(0);
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 2 + bary_dxdy_img_sC * 0] = scalar_t(0);
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 0 + bary_dxdy_img_sC * 1] = scalar_t(0);
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 1 + bary_dxdy_img_sC * 1] = scalar_t(0);
+        bary_dxdy_img_ptr[bary_dxdy_img_sB * 2 + bary_dxdy_img_sC * 1] = scalar_t(0);
+      }
       bary_img_ptr[bary_img_sB * 0] = scalar_t(0);
       bary_img_ptr[bary_img_sB * 1] = scalar_t(0);
       bary_img_ptr[bary_img_sB * 2] = scalar_t(0);
@@ -115,7 +154,7 @@ __global__ void render_kernel(
   }
 }
 
-template <typename scalar_t, typename index_t>
+template <typename scalar_t, typename index_t, bool return_bary_derivative>
 C10_LAUNCH_BOUNDS_1(256)
 __global__ void render_backward_kernel(
     const index_t nthreads,
@@ -124,6 +163,7 @@ __global__ void render_backward_kernel(
     TensorInfo<int32_t, index_t> index_img,
     TensorInfo<scalar_t, index_t> grad_depth_img,
     TensorInfo<scalar_t, index_t> grad_bary_img,
+    TensorInfo<scalar_t, index_t> grad_bary_dxdy_img,
     TensorInfo<scalar_t, index_t> grad_v,
     const index_t memory_span) {
   typedef typename math::TVec2<scalar_t> scalar2_t;
@@ -153,6 +193,12 @@ __global__ void render_backward_kernel(
   const index_t grad_bary_img_sH = grad_bary_img.strides[2];
   const index_t grad_bary_img_sW = grad_bary_img.strides[3];
 
+  const index_t grad_bary_dxdy_img_sN = grad_bary_dxdy_img.strides[0];
+  const index_t grad_bary_dxdy_img_sB = grad_bary_dxdy_img.strides[1];
+  const index_t grad_bary_dxdy_img_sH = grad_bary_dxdy_img.strides[2];
+  const index_t grad_bary_dxdy_img_sW = grad_bary_dxdy_img.strides[3];
+  const index_t grad_bary_dxdy_img_sC = grad_bary_dxdy_img.strides[4];
+
   const index_t grad_v_sN = grad_v.strides[0];
   const index_t grad_v_sV = grad_v.strides[1];
   const index_t grad_v_sC = grad_v.strides[2];
@@ -165,6 +211,8 @@ __global__ void render_backward_kernel(
     const int32_t tr_index = index_img.data[n * index_img_sN + h * index_img_sH + w * index_img_sW];
     const scalar_t* __restrict grad_bary_img_ptr =
         grad_bary_img.data + grad_bary_img_sN * n + grad_bary_img_sH * h + grad_bary_img_sW * w;
+    const scalar_t* __restrict grad_bary_dxdy_img_ptr =
+        grad_bary_dxdy_img.data + grad_bary_dxdy_img_sN * n + grad_bary_dxdy_img_sH * h + grad_bary_dxdy_img_sW * w;
     const scalar_t* __restrict grad_depth_img_ptr =
         grad_depth_img.data + grad_depth_img_sN * n + grad_depth_img_sH * h + grad_depth_img_sW * w;
 

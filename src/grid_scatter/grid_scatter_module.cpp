@@ -20,6 +20,7 @@ torch::Tensor grid_scatter_2d(
     const torch::Tensor& grid,
     int64_t output_height,
     int64_t output_width,
+    int64_t upsampling_factor,
     int64_t padding_mode,
     int64_t interpolation_mode,
     bool align_corners) {
@@ -27,7 +28,7 @@ torch::Tensor grid_scatter_2d(
                        .findSchemaOrThrow("grid_scatter_ext::grid_scatter_2d", "")
                        .typed<decltype(grid_scatter_2d)>();
   return op.call(
-      input, grid, output_height, output_width, padding_mode, interpolation_mode, align_corners);
+      input, grid, output_height, output_width, upsampling_factor, padding_mode, interpolation_mode, align_corners);
 }
 
 // Ideally we would need to turn off autograd handling and re-dispatch, but we just call
@@ -40,6 +41,7 @@ class GridScatter2DFunction : public torch::autograd::Function<GridScatter2DFunc
       const torch::Tensor& grid,
       int64_t output_height,
       int64_t output_width,
+      int64_t upsampling_factor,
       int64_t padding_mode,
       int64_t interpolation_mode,
       bool align_corners) {
@@ -52,9 +54,9 @@ class GridScatter2DFunction : public torch::autograd::Function<GridScatter2DFunc
     bool input_requires_grad = input.requires_grad();
 
     ctx->saved_data["data"] = std::make_tuple(
-        grid_requires_grad, input_requires_grad, padding_mode, interpolation_mode, align_corners);
+        grid_requires_grad, input_requires_grad, upsampling_factor, padding_mode, interpolation_mode, align_corners);
     auto out = grid_scatter_2d_cuda(
-        input, grid, output_height, output_width, padding_mode, interpolation_mode, align_corners);
+        input, grid, output_height, output_width, upsampling_factor, padding_mode, interpolation_mode, align_corners);
     return {out};
   }
 
@@ -63,15 +65,16 @@ class GridScatter2DFunction : public torch::autograd::Function<GridScatter2DFunc
       torch::autograd::tensor_list grad_outputs) {
     bool grid_requires_grad;
     bool input_requires_grad;
+    int64_t upsampling_factor;
     int64_t padding_mode;
     int64_t interpolation_mode;
     bool align_corners;
     std::tie(
-        grid_requires_grad, input_requires_grad, padding_mode, interpolation_mode, align_corners) =
-        ctx->saved_data["data"].to<std::tuple<bool, bool, int64_t, int64_t, bool>>();
+        grid_requires_grad, input_requires_grad, upsampling_factor, padding_mode, interpolation_mode, align_corners) =
+        ctx->saved_data["data"].to<std::tuple<bool, bool, int64_t, int64_t, int64_t, bool>>();
     torch::autograd::tensor_list out;
     if (!grid_requires_grad && !input_requires_grad) {
-      out.resize(7);
+      out.resize(8);
       return out;
     }
     const auto saved = ctx->get_saved_variables();
@@ -94,6 +97,7 @@ class GridScatter2DFunction : public torch::autograd::Function<GridScatter2DFunc
     out.emplace_back();
     out.emplace_back();
     out.emplace_back();
+    out.emplace_back();
     return out;
   }
 };
@@ -103,11 +107,12 @@ torch::Tensor grid_scatter_2d_autograd(
     const torch::Tensor& grid,
     int64_t output_height,
     int64_t output_width,
+    int64_t upsampling_factor,
     int64_t padding_mode,
     int64_t interpolation_mode,
     bool align_corners) {
   return GridScatter2DFunction::apply(
-      input, grid, output_height, output_width, padding_mode, interpolation_mode, align_corners)[0];
+      input, grid, output_height, output_width, upsampling_factor, padding_mode, interpolation_mode, align_corners)[0];
 }
 
 torch::Tensor grid_scatter_2d_autocast(
@@ -115,6 +120,7 @@ torch::Tensor grid_scatter_2d_autocast(
     const torch::Tensor& grid,
     int64_t output_height,
     int64_t output_width,
+    int64_t upsampling_factor,
     int64_t padding_mode,
     int64_t interpolation_mode,
     bool align_corners) {
@@ -124,6 +130,7 @@ torch::Tensor grid_scatter_2d_autocast(
       at::autocast::cached_cast(torch::kFloat32, grid),
       output_height,
       output_width,
+      upsampling_factor,
       padding_mode,
       interpolation_mode,
       align_corners);
@@ -137,7 +144,7 @@ PYBIND11_MODULE(grid_scatter_ext, m) {}
 
 TORCH_LIBRARY(grid_scatter_ext, m) {
   m.def(
-      "grid_scatter_2d(Tensor input, Tensor grid, int output_height, int output_width, int padding_mode, int interpolation_mode, bool align_corners) -> Tensor");
+      "grid_scatter_2d(Tensor input, Tensor grid, int output_height, int output_width, int upsampling_factor, int padding_mode, int interpolation_mode, bool align_corners) -> Tensor");
 }
 
 TORCH_LIBRARY_IMPL(grid_scatter_ext, Autograd, m) {

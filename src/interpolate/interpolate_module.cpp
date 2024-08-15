@@ -103,6 +103,8 @@ PYBIND11_MODULE(interpolate_ext, m) {}
 TORCH_LIBRARY(interpolate_ext, m) {
   m.def(
       "interpolate(Tensor vert_attributes, Tensor vi, Tensor index_img, Tensor bary_img) -> Tensor");
+  m.def(
+      "interpolate_dxdy(Tensor vert_attributes, Tensor vi, Tensor index_img, Tensor bary_img) -> Tensor");
 }
 
 TORCH_LIBRARY_IMPL(interpolate_ext, Autograd, m) {

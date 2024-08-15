@@ -102,7 +102,7 @@ compute_coordinates(scalar_t coord, int size, GridSamplerPadding padding_mode, b
 
 template <typename scalar_t>
 static __forceinline__ __device__ scalar_t get_value_bounded(
-    scalar_t* data,
+    const scalar_t* data,
     scalar_t x,
     scalar_t y,
     int W,
@@ -202,5 +202,18 @@ static __forceinline__ __device__ void safe_add_2d4(
     fastAtomicAdd(data, ptr + 1 * stride, memory_span, delta.y, true);
     fastAtomicAdd(data, ptr + 2 * stride, memory_span, delta.z, true);
     fastAtomicAdd(data, ptr + 3 * stride, memory_span, delta.w, true);
+  }
+}
+
+// inverse of grid_sampler_unnormalize
+template <typename scalar_t>
+static __forceinline__ __device__
+    scalar_t grid_sampler_normalize(scalar_t coord, int size, bool align_corners) {
+  if (align_corners) {
+    // normalize coord from [0, size - 1] to [-1, 1]
+    return coord * (scalar_t(2.) / scalar_t(size - 1)) - scalar_t(1.) ;
+  } else {
+    // unnormalize coord from [-0.5, size - 0.5] to [-1, 1]
+    return (coord * scalar_t(2.) + scalar_t(1.)) / scalar_t(size) - scalar_t(1.);
   }
 }

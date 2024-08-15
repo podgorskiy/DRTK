@@ -20,6 +20,7 @@ def grid_scatter(
     grid: th.Tensor,
     output_height: int,
     output_width: int,
+    upsampling_factor: int = 1,
     mode: str = "bilinear",
     padding_mode: str = "border",
     align_corners: Optional[bool] = None,
@@ -61,6 +62,7 @@ def grid_scatter(
         grid,
         output_height,
         output_width,
+        upsampling_factor,
         padding_mode_enum,
         mode_enum,
         align_corners,
@@ -133,10 +135,15 @@ def grid_scatter_ref(
     grid: th.Tensor,
     output_height: int,
     output_width: int,
+    upsampling_factor: int = 1,
     mode: str = "bilinear",
     padding_mode: str = "border",
     align_corners: Optional[bool] = None,
 ) -> th.Tensor:
+    if upsampling_factor != 1:
+        grid = thf.interpolate(grid.permute(0, 3, 1, 2), scale_factor=upsampling_factor, mode=mode, align_corners=align_corners).permute(0, 2, 3, 1)
+        input = thf.interpolate(input, scale_factor=upsampling_factor, mode=mode, align_corners=align_corners)
+
     return _grid_scatter_ref(
         input,
         grid,
@@ -145,4 +152,4 @@ def grid_scatter_ref(
         mode,
         padding_mode,
         align_corners,
-    )
+    ) / upsampling_factor / upsampling_factor
