@@ -119,7 +119,7 @@ def edge_grad_estimator_ref(
 ) -> th.Tensor:
     """
     Python reference implementation for
-    :func:`drtk.edge_grad_estimator.edge_grad_estimator`.
+    :func:`drtk.edge_grad_estimator`.
     """
 
     # could use v_pix_img output from DRTK, but bary_img needs to be detached.

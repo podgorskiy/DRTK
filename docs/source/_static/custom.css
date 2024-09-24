@@ -19,11 +19,19 @@ article.bd-article .function dt.sig {
   font-size: 0.9em;
   font-family: IBMPlexMono,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New", monospace, var(--pst-font-family-monospace-system);
 }
+
 html {
-  --pst-color-inline-code: #951c1c;
-  --pst-font-size-icon: 3rem;
+  --pst-color-inline-code: #912525;
+  --pst-font-size-icon: 2.0rem;
+  --bs-nav-link-font-size: 1.2rem;
 }
 
 .navbar-brand {
-  font-size: 2.0em;
+  font-size: 2.5em;
+}
+.bd-main .bd-content .bd-article-container {
+  max-width: 80em;  default is 60em
+}
+.bd-page-width {
+  max-width: 96rem;  default is 88rem
 }

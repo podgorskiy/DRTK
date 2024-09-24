@@ -43,6 +43,7 @@ katex_prerender = True
 exclude_patterns = []
 
 master_doc = "index"
+autodoc_typehints = "none"
 
 html_theme_options = {
     # 'github_user': 'facebookresearch',
@@ -83,7 +84,7 @@ html_theme_options = {
             # URL where the link will redirect
             "url": "https://github.com/facebookresearch/DRTK",  # required
             # Icon class (if "type": "fontawesome"), or path to local image (if "type": "local")
-            "icon": "fa-brands fa-square-github",
+            "icon": "fa-brands fa-github fa-2xl",
             # The type of image to be used (see below for details)
             "type": "fontawesome",
             "attributes": {
