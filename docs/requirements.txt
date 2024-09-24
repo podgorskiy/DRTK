@@ -1,0 +1,6 @@
+sphinx
+sphinx_markdown_builder
+sphinx-panels
+sphinxcontrib-katex
+# PyTorch Theme
+-e git+https://github.com/pytorch/pytorch_sphinx_theme.git#egg=pytorch_sphinx_theme

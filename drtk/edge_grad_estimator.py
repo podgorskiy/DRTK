@@ -25,9 +25,13 @@ def edge_grad_estimator(
     index_img: th.Tensor,
     v_pix_img_hook: Optional[Callable[[th.Tensor], None]] = None,
 ) -> th.Tensor:
-    """
+    """ Make ``img`` differentiable with respect to visibility discontinuities and propagate the gradient to ``v_pix``.
+    The function takes render ``img`` which could be either only differentiable with respect to continues component,
+    or it could be not differentiable at all. Assuming that the ``bary_img`` and ``index_img`` match the rendered image
+    ``img``, the function returns `img`` as is, but adds the differentiability of  discontinuities.
+
     Args:
-        v_pix: Pixel-space vertex coordinates with preserved camera-space Z-values.
+        v_pix: (Tensor) Pixel-space vertex coordinates with preserved camera-space Z-values.
             N x V x 3
 
         vi: face vertex index list tensor
@@ -55,14 +59,17 @@ def edge_grad_estimator(
         Any operation as long as it is differentiable is ok after the edge_grad_estimator.
 
         Examples of opeartions that can be done before edge_grad_estimator:
+
             - Pixel-wise MLP
             - Color mapping
             - Color correction, gamma correction
+
         If the operation is significantly non-linear, then it is recommended to do it before
         edge_grad_estimator. All sorts of clipping and clamping (e.g. `x.clamp(min=0.0, max=1.0)`), must be
         done before edge_grad_estimator.
 
         Examples of operations that are not allowed before edge_grad_estimator:
+
             - Gaussian blur
             - Warping, deformation
             - Masking, cropping, making holes.
