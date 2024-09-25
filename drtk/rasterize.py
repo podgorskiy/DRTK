@@ -8,9 +8,13 @@ from typing import Tuple
 
 import torch as th
 
-from drtk import rasterize_ext
-
-th.ops.load_library(rasterize_ext.__file__)
+try:
+    from drtk import rasterize_ext
+    th.ops.load_library(rasterize_ext.__file__)
+except ImportError as e:
+    import sys
+    if 'sphinx' not in sys.modules:
+        raise e
 
 
 @th.compiler.disable

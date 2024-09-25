@@ -4,6 +4,9 @@
 
 import os
 import sys
+import builtins
+
+builtins.__sphinx_build__ = True
 
 current_dir = os.path.dirname(__file__)
 target_dir = os.path.abspath(os.path.join(current_dir, "../.."))

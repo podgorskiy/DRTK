@@ -8,9 +8,14 @@ from typing import Optional
 
 import torch as th
 import torch.nn.functional as thf
-from drtk import grid_scatter_ext
 
-th.ops.load_library(grid_scatter_ext.__file__)
+try:
+    from drtk import grid_scatter_ext
+    th.ops.load_library(grid_scatter_ext.__file__)
+except ImportError as e:
+    import sys
+    if 'sphinx' not in sys.modules:
+        raise e
 
 
 @th.compiler.disable
