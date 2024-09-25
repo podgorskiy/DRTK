@@ -448,8 +448,8 @@ positions in the camera frame. The latter is used for depth values that are writ
 </dl>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-<p>Either <code class="docutils literal notranslate"><span class="pre">K</span></code> should be specified, or <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">princpt</span></code>.
-Either <code class="docutils literal notranslate"><span class="pre">Rt</span></code> should be specified, or <code class="docutils literal notranslate"><span class="pre">campos</span></code> and <code class="docutils literal notranslate"><span class="pre">camrot</span></code>.</p>
+<p>You must specify either <code class="docutils literal notranslate"><span class="pre">K</span></code> (intrinsic matrix) or both <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">princpt</span></code> (focal length and principal point).</p>
+<p>Additionally, you must provide either <code class="docutils literal notranslate"><span class="pre">Rt</span></code> (extrinsic matrix) or both <code class="docutils literal notranslate"><span class="pre">campos</span></code> (camera position) and <code class="docutils literal notranslate"><span class="pre">camrot</span></code> (camera rotation).</p>
 </div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>

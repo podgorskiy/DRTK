@@ -412,14 +412,14 @@ document.write(`
 
 <span class="sd">    Args:</span>
 <span class="sd">        v (th.Tensor):  vertex positions. The first two components are the projected vertex&#39;s location (x, y)</span>
-<span class="sd">        on the image plane. The coordinates of the top left corner are (-0.5, -0.5), and the coordinates of</span>
-<span class="sd">        the bottom right corner are (width - 0.5, height - 0.5). The z component is expected to be in the</span>
-<span class="sd">        camera space coordinate frame (before projection).</span>
+<span class="sd">            on the image plane. The coordinates of the top left corner are (-0.5, -0.5), and the coordinates of</span>
+<span class="sd">            the bottom right corner are (width - 0.5, height - 0.5). The z component is expected to be in the</span>
+<span class="sd">            camera space coordinate frame (before projection).</span>
 <span class="sd">            N x V x 3</span>
 
 <span class="sd">        vi (th.Tensor): face vertex index list tensor. The most significant nibble of vi is reserved for</span>
-<span class="sd">        controlling visibility of the edges in wireframe mode. In non-wireframe mode, content of the most</span>
-<span class="sd">        significant nibble of vi will be ignored.</span>
+<span class="sd">            controlling visibility of the edges in wireframe mode. In non-wireframe mode, content of the most</span>
+<span class="sd">            significant nibble of vi will be ignored.</span>
 <span class="sd">            V x 3</span>
 
 <span class="sd">        height (int): height of the image in pixels.</span>
@@ -427,10 +427,10 @@ document.write(`
 <span class="sd">        width (int): width of the image in pixels.</span>
 
 <span class="sd">        wireframe (bool): If False (default), rasterizes triangles. If True, rasterizes lines, where the most</span>
-<span class="sd">        significant nibble of vi is reinterpreted as a bit field controlling the visibility of the edges. The</span>
-<span class="sd">        least significant bit controls the visibility of the first edge, the second bit controls the</span>
-<span class="sd">        visibility of the second edge, and the third bit controls the visibility of the third edge. This</span>
-<span class="sd">        limits the maximum number of vertices to 268435455.</span>
+<span class="sd">            significant nibble of vi is reinterpreted as a bit field controlling the visibility of the edges. The</span>
+<span class="sd">            least significant bit controls the visibility of the first edge, the second bit controls the</span>
+<span class="sd">            visibility of the second edge, and the third bit controls the visibility of the third edge. This</span>
+<span class="sd">            limits the maximum number of vertices to 268435455.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        The rasterized image of triangle indices which is represented with an index tensor of a shape</span>
@@ -458,10 +458,10 @@ document.write(`
     <span class="n">wireframe</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Same as `rasterize` function, additionally returns depth image. Internally it uses the same implementation</span>
+<span class="sd">    Same as :func:`rasterize` function, additionally returns depth image. Internally it uses the same implementation</span>
 <span class="sd">    as the rasterize function which still computes depth but does not return depth.</span>
 
-<span class="sd">    Notes:</span>
+<span class="sd">    Note:</span>
 <span class="sd">        The function is not differentiable, including the depth output.</span>
 
 <span class="sd">    The split is done intentionally to hide the depth image from the user as it is not differentiable which</span>

@@ -425,8 +425,9 @@ document.write(`
 <span class="sd">        positions in the camera frame. The latter is used for depth values that are written to the z-buffer. N x V x 3</span>
 
 <span class="sd">    .. warning::</span>
-<span class="sd">        Either ``K`` should be specified, or ``focal`` and ``princpt``.</span>
-<span class="sd">        Either ``Rt`` should be specified, or ``campos`` and ``camrot``.</span>
+<span class="sd">        You must specify either ``K`` (intrinsic matrix) or both ``focal`` and ``princpt`` (focal length and principal point).</span>
+
+<span class="sd">        Additionally, you must provide either ``Rt`` (extrinsic matrix) or both ``campos`` (camera position) and ``camrot`` (camera rotation).</span>
 
 <span class="sd">    .. note::</span>
 <span class="sd">        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of shape N x 3 x 1, then:</span>

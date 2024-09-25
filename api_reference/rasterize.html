@@ -416,7 +416,7 @@ document.write(`
 <td><p>Rasterizes a mesh defined by v and vi.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#drtk.rasterize_with_depth" title="drtk.rasterize_with_depth"><code class="xref py py-obj docutils literal notranslate"><span class="pre">rasterize_with_depth</span></code></a></p></td>
-<td><p>Same as <cite>rasterize</cite> function, additionally returns depth image.</p></td>
+<td><p>Same as <a class="reference internal" href="#drtk.rasterize" title="drtk.rasterize"><code class="xref py py-func docutils literal notranslate"><span class="pre">rasterize()</span></code></a> function, additionally returns depth image.</p></td>
 </tr>
 </tbody>
 </table>
@@ -428,23 +428,22 @@ document.write(`
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>v</strong> (<em>th.Tensor</em>) – vertex positions. The first two components are the projected vertex’s location (x, y)</p></li>
-<li><p><strong>are</strong> (<em>the bottom right corner</em>)</p></li>
-<li><p><strong>are</strong></p></li>
-<li><p><strong>frame</strong> (<em>camera space coordinate</em>) – N x V x 3</p></li>
-<li><p><strong>vi</strong> (<em>th.Tensor</em>) – face vertex index list tensor. The most significant nibble of vi is reserved for</p></li>
-<li><p><strong>mode</strong> (<em>controlling visibility</em><em> of </em><em>the edges in wireframe mode. In non-wireframe</em>)</p></li>
-<li><p><strong>most</strong> (<em>content</em><em> of </em><em>the</em>)</p></li>
-<li><p><strong>ignored.</strong> (<em>significant nibble</em><em> of </em><em>vi will be</em>) – V x 3</p></li>
+<li><p><strong>v</strong> (<em>th.Tensor</em>) – vertex positions. The first two components are the projected vertex’s location (x, y)
+on the image plane. The coordinates of the top left corner are (-0.5, -0.5), and the coordinates of
+the bottom right corner are (width - 0.5, height - 0.5). The z component is expected to be in the
+camera space coordinate frame (before projection).
+N x V x 3</p></li>
+<li><p><strong>vi</strong> (<em>th.Tensor</em>) – face vertex index list tensor. The most significant nibble of vi is reserved for
+controlling visibility of the edges in wireframe mode. In non-wireframe mode, content of the most
+significant nibble of vi will be ignored.
+V x 3</p></li>
 <li><p><strong>height</strong> (<em>int</em>) – height of the image in pixels.</p></li>
 <li><p><strong>width</strong> (<em>int</em>) – width of the image in pixels.</p></li>
-<li><p><strong>wireframe</strong> (<em>bool</em>) – If False (default), rasterizes triangles. If True, rasterizes lines, where the most</p></li>
-<li><p><strong>The</strong> (<em>significant nibble</em><em> of </em><em>vi is reinterpreted as a bit field controlling the visibility</em><em> of </em><em>the edges.</em>)</p></li>
-<li><p><strong>edge</strong> (<em>visibility</em><em> of </em><em>the second</em>)</p></li>
-<li><p><strong>the</strong> (<em>the second bit controls</em>)</p></li>
-<li><p><strong>edge</strong></p></li>
-<li><p><strong>This</strong> (<em>and the third bit controls the visibility</em><em> of </em><em>the third edge.</em>)</p></li>
-<li><p><strong>268435455.</strong> (<em>limits the maximum number</em><em> of </em><em>vertices to</em>)</p></li>
+<li><p><strong>wireframe</strong> (<em>bool</em>) – If False (default), rasterizes triangles. If True, rasterizes lines, where the most
+significant nibble of vi is reinterpreted as a bit field controlling the visibility of the edges. The
+least significant bit controls the visibility of the first edge, the second bit controls the
+visibility of the second edge, and the third bit controls the visibility of the third edge. This
+limits the maximum number of vertices to 268435455.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
@@ -464,10 +463,12 @@ instead.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="drtk.rasterize_with_depth">
 <span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">rasterize_with_depth</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">height</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">width</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wireframe</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/rasterize.html#rasterize_with_depth"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.rasterize_with_depth" title="Link to this definition">#</a></dt>
-<dd><p>Same as <cite>rasterize</cite> function, additionally returns depth image. Internally it uses the same implementation
+<dd><p>Same as <a class="reference internal" href="#drtk.rasterize" title="drtk.rasterize"><code class="xref py py-func docutils literal notranslate"><span class="pre">rasterize()</span></code></a> function, additionally returns depth image. Internally it uses the same implementation
 as the rasterize function which still computes depth but does not return depth.</p>
-<p class="rubric">Notes</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
 <p>The function is not differentiable, including the depth output.</p>
+</div>
 <p>The split is done intentionally to hide the depth image from the user as it is not differentiable which
 may cause errors if assumed otherwise. Instead, the`barycentrics` function should be used instead to
 compute the differentiable version of depth.</p>
