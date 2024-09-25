@@ -33,6 +33,9 @@ extensions = ['sphinx_markdown_builder',
               "sphinx.ext.viewcode",
               'sphinx.ext.napoleon',
               "sphinxcontrib.katex",
+              "sphinx.ext.intersphinx",
+              "myst_parser",
+              "sphinx_design",
               ]
 autosummary_generate = True
 katex_prerender = True

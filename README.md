@@ -50,7 +50,7 @@ img = bary * (index_img != -1)
 save_image(img, "render.png")
 ```
 
-![hello triangle](docs/hellow_triangle.png)
+![hello triangle](docs/source/_static/hellow_triangle.png)
 
 ## Dependencies
 * PyTorch >= 2.1.0

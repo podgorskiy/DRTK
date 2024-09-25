@@ -35,7 +35,7 @@ html[data-theme="light"] {
 html {
   --pst-color-inline-code: #912525;
   --pst-font-size-icon: 2.0rem;
-  --bs-nav-link-font-size: 1.2rem;
+  --bs-nav-link-font-size: 1.5rem;
   --pst-color-surface: #f2f2f2;
 }
 
@@ -44,10 +44,10 @@ a.headerlink {
 }
 
 ul.bd-breadcrumbs {
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   li.breadcrumb-item {
     &:not(.breadcrumb-home)::before {
-      font-size: 1.2rem;
+      font-size: 1.5rem;
     }
   }
 }
