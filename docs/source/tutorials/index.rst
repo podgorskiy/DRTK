@@ -1,7 +1,7 @@
 
 :github_url: https://github.com/facebookresearch/DRTK
 
-DRTK API
+Tutorials
 ===================================
 
 DRTK is a PyTorch library that provides functionality for differentiable rasterization.
@@ -25,9 +25,6 @@ The package consists of five main modules:
    render
    interpolate
    edge_grad_estimator
-   mipmap_grid_sample
-   grid_scatter
-   msi
 
 
 .. toctree::

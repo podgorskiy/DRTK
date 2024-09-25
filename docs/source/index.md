@@ -8,26 +8,27 @@ html_theme.sidebar_secondary.remove: true
 
 # DRTK – Differentiable Rendering Toolkit
 
-DRTK is a PyTorch library that provides functionality for differentiable rasterization.
+DRTK is a Python package built on top of PyTorch, offering differentiable rasterization functionality. 
+We focus on rasterization due to its speed, providing functionality which is typically common in real-time graphics, while leaving shading and lighting/material models for user implementation.
 
-A typical flow looks like this:
+Rasterization is a widely used rendering technique due to its speed and efficiency, especially for real-time applications. 
+However, it presents challenges when used in differentiable rendering pipelines, particularly at visibility boundaries, where non-differentiable operations, such as discrete pixel coverage and occlusions, occur.
+DRTK implements a novel approach to computing gradients at these visibility discontinuities described in [**Rasterized Edge Gradients: Handling Discontinuities Differentiably**](https://arxiv.org/abs/2405.02508), overcoming the limitations inherent in rasterization’s fixed-grid structure and z-buffering. 
+DRTK keeps the rasterization process intact and efficient while enabling gradient propagation through occlusion boundaries and geometry intersections.
+DRTK provides a set of differentiable components to build custom differentiable rendering pipelines, like the following:
 
-{bdg-primary}`transform` → {bdg-primary}`rasterize` → {bdg-primary}`render` → {bdg-primary}`interpolate` → {bdg-warning}`CUSTOM SHADING` → {bdg-primary}`edge_grad` → {bdg-warning}`LOSS FUNCTION`
+{bdg-primary-line}`model` → {bdg-primary}`transform` → {bdg-primary}`rasterize` → {bdg-primary}`render` → {bdg-primary}`interpolate` → {bdg-warning}`CUSTOM SHADING` → {bdg-primary-line}`rendered image` → {bdg-primary}`edge_grad` → {bdg-warning}`LOSS FUNCTION`
 
-where DRTK package provides:
-- {bdg-primary}`transform`  : projects the vertex positions from camera space to image space
-- {bdg-primary}`rasterize` : performs rasterization, where pixels in the output image are associated with triangles
-- {bdg-primary}`render` : computes depth and baricentric image
-- {bdg-primary}`interpolate` : interpolates arbitrary vertex attributes
-- {bdg-primary}`edge_grad` : module for computing gradients at discontinuities. For details refer to [**Rasterized Edge Gradients: Handling Discontinuities Differentiably**](https://arxiv.org/abs/2405.02508)
+* **transform**: Projects vertex positions from camera space to image space.
+* **rasterize**: Performs rasterization, mapping output pixels to triangles.
+* **render**: Computes depth and barycentric images.
+* **interpolate**: Interpolates arbitrary vertex attributes.
+* **edge_grad**: Computes gradients at discontinuities.
+* **CUSTOM SHADING** and **LOSS FUNCTION**: User-defined components for shading and loss calculation.
 
-While the following, typically implemented by the User:
-- {bdg-warning}`CUSTOM SHADING` : user implemented shading
-- {bdg-warning}`LOSS FUNCTION` : user implemented loss function
+## Hello Triangle!
 
-## Hello Triangle
-
-The "Hello Triangle" with DRTK would look like this:
+Here's a simple "Hello Triangle" example with DRTK:
 ```python
 import drtk
 import torch as th
@@ -54,27 +55,30 @@ save_image(img, "render.png")
 
 ![hello triangle](/_static/hellow_triangle.png)
 
-## Dependencies
-Cure dependencies:
-* PyTorch >= 2.1.0
-* numpy
 
-Some examples and tests, may additionally require:
-* torchvision
-* opencv-python
-
-## Building
-To build a wheel and install it:
+## Installation
+To build and install the DRTK package as a wheel:
 ```
 pip install wheel
 python setup.py  bdist_wheel
 pip install dist/drtk-<wheel_name>.whl
 ```
 
-To build inplace, which is useful for package development:
+For in-place builds, useful for development:
 ```
 python setup.py build_ext --inplace -j 1
 ```
+
+
+## Requirements
+Cure dependencies:
+* CUDA Toolkit
+* PyTorch (>= 2.1.0)
+* numpy
+
+Some examples and tests may also require:
+* torchvision
+* opencv-python
 
 ## Contributing
 See the [CONTRIBUTING](https://github.com/facebookresearch/DRTK//blob/main/CONTRIBUTING.md) file for how to help out.
@@ -106,7 +110,7 @@ installation/index
 :maxdepth: 2
 :hidden:
 
-examples/index
+tutorials/index
 ```
 
 ```{toctree}
