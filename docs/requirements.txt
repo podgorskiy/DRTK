@@ -6,5 +6,3 @@ pydata_sphinx_theme
 accessible-pygments
 myst_parser
 sphinx_design
-# PyTorch Theme
--e git+https://github.com/pytorch/pytorch_sphinx_theme.git#egg=pytorch_sphinx_theme
