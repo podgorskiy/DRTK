@@ -43,8 +43,9 @@ def transform(
         positions in the camera frame. The latter is used for depth values that are written to the z-buffer. N x V x 3
 
     .. warning::
-        Either ``K`` should be specified, or ``focal`` and ``princpt``.
-        Either ``Rt`` should be specified, or ``campos`` and ``camrot``.
+        You must specify either ``K`` (intrinsic matrix) or both ``focal`` and ``princpt`` (focal length and principal point).
+
+        Additionally, you must provide either ``Rt`` (extrinsic matrix) or both ``campos`` (camera position) and ``camrot`` (camera rotation).
 
     .. note::
         If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of shape N x 3 x 1, then:
