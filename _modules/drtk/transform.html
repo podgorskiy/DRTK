@@ -384,7 +384,7 @@ document.write(`
 <span class="c1"># This source code is licensed under the license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
 
 <span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">th</span>
 <span class="kn">from</span> <span class="nn">drtk.utils</span> <span class="kn">import</span> <span class="n">project_points</span>
@@ -400,43 +400,37 @@ document.write(`
     <span class="n">princpt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">K</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">Rt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">distortion_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">distortion_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">distortion_coeff</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fov</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    v: Tensor, N x V x 3</span>
-<span class="sd">    Batch of vertex positions for vertices in the mesh.</span>
+<span class="sd">    Projects 3D vertex positions onto the image plane of the camera.</span>
 
-<span class="sd">    campos: Tensor, N x 3</span>
-<span class="sd">    Camera position.</span>
+<span class="sd">    Args:</span>
+<span class="sd">        v (th.Tensor):  vertex positions. N x V x 3</span>
+<span class="sd">        campos (Tensor): Camera position. N x 3</span>
+<span class="sd">        camrot (Tensor): Camera rotation matrix. N x 3 x 3</span>
+<span class="sd">        focal (Tensor): Focal length. The upper left 2x2 block of the intrinsic matrix [[f_x, s], [0, f_y]].  N x 2 x 2</span>
+<span class="sd">        princpt (Tensor): Camera principal point [cx, cy]. N x 2</span>
+<span class="sd">        K (Tensor): Camera intrinsic calibration matrix, N x 3 x 3</span>
+<span class="sd">        Rt (Tensor): Camera extrinsic matrix. N x 3 x 4 or N x 4 x 4</span>
+<span class="sd">        distortion_mode (List[str]): Names of the distortion modes.</span>
+<span class="sd">        distortion_coeff (Tensor): Distortion coefficients. N x 4</span>
+<span class="sd">        fov (Tensor): Valid field of view of the distortion model. N x 1</span>
 
-<span class="sd">    camrot: Tensor, N x 3 x 3</span>
-<span class="sd">    Camera rotation matrix.</span>
+<span class="sd">    Returns:</span>
+<span class="sd">        Vertex positions projected onto the image plane of the camera. The last dimension has still size 3.</span>
+<span class="sd">        The first two components are the x and y coordinates on the image plane, and the z is z component of the vertex</span>
+<span class="sd">        positions in the camera frame. The latter is used for depth values that are written to the z-buffer. N x V x 3</span>
 
-<span class="sd">    focal: Tensor, N x 2 x 2</span>
-<span class="sd">    Focal length [[fx, 0],</span>
-<span class="sd">                  [0, fy]]</span>
+<span class="sd">    .. warning::</span>
+<span class="sd">        Either ``K`` should be specified, or ``focal`` and ``princpt``.</span>
+<span class="sd">        Either ``Rt`` should be specified, or ``campos`` and ``camrot``.</span>
 
-<span class="sd">    princpt: Tensor, N x 2</span>
-<span class="sd">    Principal point [cx, cy]</span>
-
-<span class="sd">    K: Tensor, N x 3 x 3</span>
-<span class="sd">    Camera intrinsic calibration matrix. Either this or both (focal,</span>
-<span class="sd">    princpt) must be provided.</span>
-
-<span class="sd">    Rt: Tensor, N x 3 x 4 or N x 4 x 4</span>
-<span class="sd">    Camera extrinsic matrix. Either this or both (camrot, campos) must be</span>
-<span class="sd">    provided. Camrot is the upper 3x3 of Rt, campos = -R.T @ t.</span>
-
-<span class="sd">    distortion_mode: List[str]</span>
-<span class="sd">    Names of the distortion modes.</span>
-
-<span class="sd">    distortion_coeff: Tensor, N x 4</span>
-<span class="sd">    Distortion coefficients.</span>
-
-<span class="sd">    fov: Tensor, N x 1</span>
-<span class="sd">    Valid field of view of the distortion model.</span>
+<span class="sd">    .. note::</span>
+<span class="sd">        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of shape N x 3 x 1, then:</span>
+<span class="sd">        ``camrot`` is ``R``, and ``campos`` is ``-R.T @ t``.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -458,7 +452,7 @@ document.write(`
     <span class="n">princpt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">K</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">Rt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">distortion_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Sequence</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">distortion_mode</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">distortion_coeff</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">fov</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">,</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">]:</span>

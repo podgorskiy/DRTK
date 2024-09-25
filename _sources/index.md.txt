@@ -19,7 +19,7 @@ DRTK provides a set of differentiable components to build custom differentiable 
 
 {bdg-primary-line}`model` → {bdg-primary}`transform` → {bdg-primary}`rasterize` → {bdg-primary}`render` → {bdg-primary}`interpolate` → {bdg-warning}`CUSTOM SHADING` → {bdg-primary-line}`rendered image` → {bdg-primary}`edge_grad` → {bdg-warning}`LOSS FUNCTION`
 
-* **transform**: Projects vertex positions from camera space to image space.
+* **transform**: Projects 3D vertex positions onto the image plane of the camera.
 * **rasterize**: Performs rasterization, mapping output pixels to triangles.
 * **render**: Computes depth and barycentric images.
 * **interpolate**: Interpolates arbitrary vertex attributes.

@@ -362,7 +362,7 @@ DRTK keeps the rasterization process intact and efficient while enabling gradien
 DRTK provides a set of differentiable components to build custom differentiable rendering pipelines, like the following:</p>
 <p><span class="sd-sphinx-override sd-badge sd-outline-primary sd-text-primary">model</span> → <span class="sd-sphinx-override sd-badge sd-bg-primary sd-bg-text-primary">transform</span> → <span class="sd-sphinx-override sd-badge sd-bg-primary sd-bg-text-primary">rasterize</span> → <span class="sd-sphinx-override sd-badge sd-bg-primary sd-bg-text-primary">render</span> → <span class="sd-sphinx-override sd-badge sd-bg-primary sd-bg-text-primary">interpolate</span> → <span class="sd-sphinx-override sd-badge sd-bg-warning sd-bg-text-warning">CUSTOM SHADING</span> → <span class="sd-sphinx-override sd-badge sd-outline-primary sd-text-primary">rendered image</span> → <span class="sd-sphinx-override sd-badge sd-bg-primary sd-bg-text-primary">edge_grad</span> → <span class="sd-sphinx-override sd-badge sd-bg-warning sd-bg-text-warning">LOSS FUNCTION</span></p>
 <ul class="simple">
-<li><p><strong>transform</strong>: Projects vertex positions from camera space to image space.</p></li>
+<li><p><strong>transform</strong>: Projects 3D vertex positions onto the image plane of the camera.</p></li>
 <li><p><strong>rasterize</strong>: Performs rasterization, mapping output pixels to triangles.</p></li>
 <li><p><strong>render</strong>: Computes depth and barycentric images.</p></li>
 <li><p><strong>interpolate</strong>: Interpolates arbitrary vertex attributes.</p></li>
