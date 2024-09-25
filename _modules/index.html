@@ -6,9 +6,8 @@
 
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-
-    <title>Indexing utils &#8212; DRTK 0.1 documentation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Overview: module code &#8212; DRTK 0.1 documentation</title>
   
   
   
@@ -43,10 +42,9 @@
     <script src="../_static/doctools.js?v=9a2dae69"></script>
     <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
     <script src="../_static/design-tabs.js?v=f930bc37"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'api_reference/indexing';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = '_modules/index';</script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="Geometry utils" href="geometry.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   </head>
@@ -147,8 +145,8 @@
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api_reference/index.html">
     DRTK API
   </a>
 </li>
@@ -231,10 +229,6 @@ document.write(`
   
 
   
-    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
-      <span class="fa-solid fa-outdent"></span>
-    </button>
-  
 </div>
 
     </header>
@@ -245,7 +239,9 @@ document.write(`
       
       
       
-      <div class="bd-sidebar-primary bd-sidebar">
+        
+      
+      <div class="bd-sidebar-primary bd-sidebar hide-on-wide">
         
 
   
@@ -274,8 +270,8 @@ document.write(`
 </li>
 
 
-<li class="nav-item current active">
-  <a class="nav-link nav-internal" href="index.html">
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../api_reference/index.html">
     DRTK API
   </a>
 </li>
@@ -329,32 +325,6 @@ document.write(`
     
   </div>
   
-    <div class="sidebar-primary-items__start sidebar-primary__section">
-        <div class="sidebar-primary-item">
-<nav class="bd-docs-nav bd-links"
-     aria-label="Section Navigation">
-  <p class="bd-links__title" role="heading" aria-level="1">Section Navigation</p>
-  <div class="bd-toc-item navbar-nav"><p aria-level="2" class="caption" role="heading"><span class="caption-text">Main API</span></p>
-<ul class="nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="transform.html">drtk.transform</a></li>
-<li class="toctree-l1"><a class="reference internal" href="rasterize.html">drtk.rasterize</a></li>
-<li class="toctree-l1"><a class="reference internal" href="render.html">drtk.render</a></li>
-<li class="toctree-l1"><a class="reference internal" href="interpolate.html">drtk.interpolate</a></li>
-<li class="toctree-l1"><a class="reference internal" href="edge_grad_estimator.html">drtk.edge_grad_estimator</a></li>
-<li class="toctree-l1"><a class="reference internal" href="mipmap_grid_sample.html">drtk.mipmap_grid_sample</a></li>
-<li class="toctree-l1"><a class="reference internal" href="grid_scatter.html">drtk.grid_scatter</a></li>
-<li class="toctree-l1"><a class="reference internal" href="msi.html">drtk.msi</a></li>
-</ul>
-<p aria-level="2" class="caption" role="heading"><span class="caption-text">Utils</span></p>
-<ul class="current nav bd-sidenav">
-<li class="toctree-l1"><a class="reference internal" href="projection.html">Projection functions</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geometry.html">Geometry utils</a></li>
-<li class="toctree-l1 current active"><a class="current reference internal" href="#">Indexing utils</a></li>
-</ul>
-</div>
-</nav></div>
-    </div>
-  
   
   <div class="sidebar-primary-items__end sidebar-primary__section">
   </div>
@@ -387,10 +357,7 @@ document.write(`
         <i class="fa-solid fa-home"></i>
       </a>
     </li>
-    
-    <li class="breadcrumb-item"><a href="index.html" class="nav-link">DRTK API</a></li>
-    
-    <li class="breadcrumb-item active" aria-current="page">Indexing utils</li>
+    <li class="breadcrumb-item active" aria-current="page">Overview:...</li>
   </ul>
 </nav>
 </div>
@@ -407,30 +374,11 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="module-drtk.utils.indexing">
-<span id="indexing-utils"></span><h1>Indexing utils<a class="headerlink" href="#module-drtk.utils.indexing" title="Link to this heading">#</a></h1>
-<div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
-<tbody>
-<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.utils.indexing.index" title="drtk.utils.indexing.index"><code class="xref py py-obj docutils literal notranslate"><span class="pre">index</span></code></a></p></td>
-<td><p>Index a tensor along a given dimension using an index tensor, replacing the shape along the given dimension with the shape of the index tensor.</p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<dl class="py function">
-<dt class="sig sig-object py" id="drtk.utils.indexing.index">
-<span class="sig-prename descclassname"><span class="pre">drtk.utils.indexing.</span></span><span class="sig-name descname"><span class="pre">index</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">x</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">idxs</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dim</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/utils/indexing.html#index"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.utils.indexing.index" title="Link to this definition">#</a></dt>
-<dd><p>Index a tensor along a given dimension using an index tensor, replacing
-the shape along the given dimension with the shape of the index tensor.</p>
-<p>Example:
-x:    [8, 7306, 3]
-idxs: [11000, 3]</p>
-<p>y = index(x, idxs, dim=1) -&gt; y: [8, 11000, 3, 3]
-with each y[b, i, j, k] = x[b, idxs[i, j], k]</p>
-</dd></dl>
-
-</section>
-
+  <h1>All modules for which code is available</h1>
+<ul><li><a href="drtk/utils/geometry.html">drtk.utils.geometry</a></li>
+<li><a href="drtk/utils/indexing.html">drtk.utils.indexing</a></li>
+<li><a href="drtk/utils/projection.html">drtk.utils.projection</a></li>
+</ul>
 
                 </article>
               
@@ -441,23 +389,6 @@ with each y[b, i, j, k] = x[b, idxs[i, j], k]</p>
             </div>
             
             
-              
-                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
-
-
-  <div class="sidebar-secondary-item">
-<div
-    id="pst-page-navigation-heading-2"
-    class="page-toc tocsection onthispage">
-    <i class="fa-solid fa-list"></i> On this page
-  </div>
-  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
-    <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.utils.indexing.index"><code class="docutils literal notranslate"><span class="pre">index()</span></code></a></li>
-</ul>
-  </nav></div>
-
-</div></div>
               
             
           </div>

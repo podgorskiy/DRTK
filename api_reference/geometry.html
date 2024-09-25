@@ -232,6 +232,10 @@ document.write(`
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -404,13 +408,84 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="geometry-utils">
-<h1>Geometry utils<a class="headerlink" href="#geometry-utils" title="Link to this heading">#</a></h1>
+  <section id="module-drtk.utils.geometry">
+<span id="geometry-utils"></span><h1>Geometry utils<a class="headerlink" href="#module-drtk.utils.geometry" title="Link to this heading">#</a></h1>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.utils.geometry.face_info" title="drtk.utils.geometry.face_info"><code class="xref py py-obj docutils literal notranslate"><span class="pre">face_info</span></code></a></p></td>
+<td><p>Given a set of vertices <code class="docutils literal notranslate"><span class="pre">v</span></code> and indices <code class="docutils literal notranslate"><span class="pre">vi</span></code> indexing into <code class="docutils literal notranslate"><span class="pre">v</span></code> defining a set of faces, compute face information (normals, edges, face areas) for each face.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drtk.utils.geometry.vert_binormals" title="drtk.utils.geometry.vert_binormals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vert_binormals</span></code></a></p></td>
+<td><p></p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.utils.geometry.vert_normals" title="drtk.utils.geometry.vert_normals"><code class="xref py py-obj docutils literal notranslate"><span class="pre">vert_normals</span></code></a></p></td>
+<td><p>Given a set of vertices <code class="docutils literal notranslate"><span class="pre">v</span></code> and indices <code class="docutils literal notranslate"><span class="pre">vi</span></code> indexing into <code class="docutils literal notranslate"><span class="pre">v</span></code> defining a set of faces, compute normals for each vertex by averaging the face normals for each face which includes that vertex.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.utils.geometry.face_info">
+<span class="sig-prename descclassname"><span class="pre">drtk.utils.geometry.</span></span><span class="sig-name descname"><span class="pre">face_info</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">to_compute</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/utils/geometry.html#face_info"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.utils.geometry.face_info" title="Link to this definition">#</a></dt>
+<dd><p>Given a set of vertices <code class="docutils literal notranslate"><span class="pre">v</span></code> and indices <code class="docutils literal notranslate"><span class="pre">vi</span></code> indexing into <code class="docutils literal notranslate"><span class="pre">v</span></code>
+defining a set of faces, compute face information (normals, edges, face
+areas) for each face.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – Vertex positions, shape [batch_size, n_vertices, 3]</p></li>
+<li><p><strong>vi</strong> – Vertex indices, shape [n_faces, 3]</p></li>
+<li><p><strong>to_compute</strong> – list of desired information. Any of: {normals, edges, areas}, defaults to all.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>Face information in the following format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="s2">&quot;normals&quot;</span><span class="p">:</span> <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="s2">&quot;edges&quot;</span><span class="p">:</span>   <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">]</span>
+    <span class="s2">&quot;areas&quot;</span><span class="p">:</span>   <span class="n">shape</span> <span class="p">[</span><span class="n">batch_size</span><span class="p">,</span> <span class="n">n_faces</span><span class="p">,</span> <span class="mi">1</span><span class="p">]</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>or just one of the above values not in a Dict if only one is
+requested.</p>
+</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.utils.geometry.vert_binormals">
+<span class="sig-prename descclassname"><span class="pre">drtk.utils.geometry.</span></span><span class="sig-name descname"><span class="pre">vert_binormals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vti</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/utils/geometry.html#vert_binormals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.utils.geometry.vert_binormals" title="Link to this definition">#</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.utils.geometry.vert_normals">
+<span class="sig-prename descclassname"><span class="pre">drtk.utils.geometry.</span></span><span class="sig-name descname"><span class="pre">vert_normals</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fnorms</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/utils/geometry.html#vert_normals"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.utils.geometry.vert_normals" title="Link to this definition">#</a></dt>
+<dd><p>Given a set of vertices <code class="docutils literal notranslate"><span class="pre">v</span></code> and indices <code class="docutils literal notranslate"><span class="pre">vi</span></code> indexing into <code class="docutils literal notranslate"><span class="pre">v</span></code>
+defining a set of faces, compute normals for each vertex by averaging the
+face normals for each face which includes that vertex.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> – Vertex positions, shape [batch_size, n_vertices, 3]</p></li>
+<li><p><strong>vi</strong> – Vertex indices, shape [batch_size, n_faces, 3]</p></li>
+<li><p><strong>fnorms</strong> – Face normals. Optional, provide them if available, otherwise they will be computed
+from <cite>v</cite> and <cite>vi</cite>. Shape [n_faces, 3]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vertex normals, shape [batch_size, n_vertices, 3]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>th.Tensor</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -423,6 +498,25 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.utils.geometry.face_info"><code class="docutils literal notranslate"><span class="pre">face_info()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.utils.geometry.vert_binormals"><code class="docutils literal notranslate"><span class="pre">vert_binormals()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.utils.geometry.vert_normals"><code class="docutils literal notranslate"><span class="pre">vert_normals()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

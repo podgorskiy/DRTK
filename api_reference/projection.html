@@ -232,6 +232,10 @@ document.write(`
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -404,13 +408,63 @@ document.write(`
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section id="projection-functions">
-<h1>Projection functions<a class="headerlink" href="#projection-functions" title="Link to this heading">#</a></h1>
+  <section id="module-drtk.utils.projection">
+<span id="projection-functions"></span><h1>Projection functions<a class="headerlink" href="#module-drtk.utils.projection" title="Link to this heading">#</a></h1>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.utils.projection.project_points" title="drtk.utils.projection.project_points"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project_points</span></code></a></p></td>
+<td><p>Project 3D world-space vertices to pixel-space, optionally applying a distortion model with provided coefficients.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drtk.utils.projection.project_points_grad" title="drtk.utils.projection.project_points_grad"><code class="xref py py-obj docutils literal notranslate"><span class="pre">project_points_grad</span></code></a></p></td>
+<td><p>Computes the gradient of projected (pixel-space) vertex positions with respect to the 3D world-space vertex positions given the gradient of the 3D world-space vertex positions.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.utils.projection.project_points">
+<span class="sig-prename descclassname"><span class="pre">drtk.utils.projection.</span></span><span class="sig-name descname"><span class="pre">project_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camrot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">princpt</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/utils/projection.html#project_points"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.utils.projection.project_points" title="Link to this definition">#</a></dt>
+<dd><p>Project 3D world-space vertices to pixel-space, optionally applying a
+distortion model with provided coefficients.</p>
+<p>Returns v_pix, v_cam, both N x V x 3 since we preserve the camera-space
+Z-coordinate for v_pix.</p>
+<p>v:                  N x V x 3
+camrot:             N x 3 x 3
+campos:             N x 3
+focal:              N x 2 x 2
+princpt:            N x 2
+distortion_coeff:   N x 4
+fov:                N x 1</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.utils.projection.project_points_grad">
+<span class="sig-prename descclassname"><span class="pre">drtk.utils.projection.</span></span><span class="sig-name descname"><span class="pre">project_points_grad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_grad</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campos</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camrot</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focal</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/utils/projection.html#project_points_grad"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.utils.projection.project_points_grad" title="Link to this definition">#</a></dt>
+<dd><p>Computes the gradient of projected (pixel-space) vertex positions with
+respect to the 3D world-space vertex positions given the gradient of the 3D
+world-space vertex positions.</p>
+<p>project_points_grad(dv, v) = d project_points(v) / dv * dv</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_grad</strong> – Gradient of 3D world-space vertices. Shape: N x V x 3</p></li>
+<li><p><strong>v</strong> – 3D world-space vertices. Shape: N x V x 3</p></li>
+<li><p><strong>camrot</strong> – Camera rotation. Shape:  N x 3 x 3</p></li>
+<li><p><strong>camrot</strong> – Camera position. Shape:  N x 3</p></li>
+<li><p><strong>focal</strong> – Focal length. Shape: N x 2 x 2</p></li>
+<li><p><strong>distortion_mode</strong> – Distortion currently not implemented and must be None.</p></li>
+<li><p><strong>distortion_coeff</strong> – Distortion currently not implemented and must be None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>N x V x 2</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Gradient of 2D pixel-space vertices</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -423,6 +477,24 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.utils.projection.project_points"><code class="docutils literal notranslate"><span class="pre">project_points()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.utils.projection.project_points_grad"><code class="docutils literal notranslate"><span class="pre">project_points_grad()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
