@@ -44,6 +44,9 @@ exclude_patterns = []
 
 master_doc = "index"
 autodoc_typehints = "none"
+html_context = {
+#     "default_mode": "light"
+}
 
 html_theme_options = {
     # 'github_user': 'facebookresearch',
@@ -60,7 +63,7 @@ html_theme_options = {
     "navbar_align": "content",
     "navbar_start": ["navbar-logo"], # , "icon-links"
     # "navbar_end": ["navbar-icon-links"],
-    "navbar_end": ["navbar-icon-links"],
+    "navbar_end": ["theme-switcher", "navbar-icon-links"],
 
     "collapse_navigation": True,
     "secondary_sidebar_items": ["page-toc"],
@@ -68,9 +71,8 @@ html_theme_options = {
     "show_prev_next" : False,
     "back_to_top_button": False,
 
-    "pygments_light_style" : 'sas',
-    "pygments_dark_style": 'monokai',
-    "default_mode": "light",
+    "pygments_light_style" : 'a11y-light',
+    "pygments_dark_style": 'a11y-dark',
 
     "github_user": "facebookresearch",
     "github_repo": "DRTK",

@@ -1,7 +1,7 @@
 
 :github_url: https://github.com/facebookresearch/DRTK
 
-API Reference
+DRTK API
 ===================================
 
 DRTK is a PyTorch library that provides functionality for differentiable rasterization.

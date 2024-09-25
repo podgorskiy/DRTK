@@ -10,7 +10,7 @@
 
 article.bd-article .function dt.sig {
   position: relative;
-  background: #f3f4f7;
+  background: var(--sig_nkg);
   padding: 0.8rem;
   border-left: 3px solid #ee4c2c;
   word-wrap: break-word;
@@ -20,10 +20,36 @@ article.bd-article .function dt.sig {
   font-family: IBMPlexMono,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New", monospace, var(--pst-font-family-monospace-system);
 }
 
+html[data-theme="dark"] {
+  --sig_nkg: #2b2b2b; #292c37;
+  --pst-color-inline-code: #e16969;
+  --pst-color-surface: #2b2b2b;
+}
+
+html[data-theme="light"] {
+  --sig_nkg: #f2f2f2; #2b2b2b; #f3f4f7;
+  --pst-color-inline-code: #912525;
+  --pst-color-surface: #f2f2f2;
+}
+
 html {
   --pst-color-inline-code: #912525;
   --pst-font-size-icon: 2.0rem;
   --bs-nav-link-font-size: 1.2rem;
+  --pst-color-surface: #f2f2f2;
+}
+
+a.headerlink {
+    font-size: 1.0em;
+}
+
+ul.bd-breadcrumbs {
+  font-size: 1.2rem;
+  li.breadcrumb-item {
+    &:not(.breadcrumb-home)::before {
+      font-size: 1.2rem;
+    }
+  }
 }
 
 .navbar-brand {
@@ -34,4 +60,12 @@ html {
 }
 .bd-page-width {
   max-width: 96rem;  default is 88rem
+}
+
+.bd-sidebar-primary {
+  width:  16rem;
+}
+
+p.bd-links__title {
+  visibility: collapse;
 }
