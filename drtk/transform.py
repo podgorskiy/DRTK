@@ -4,7 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
-from typing import Optional, Sequence, Tuple
+from typing import Optional, List, Tuple
 
 import torch as th
 from drtk.utils import project_points
@@ -18,43 +18,37 @@ def transform(
     princpt: Optional[th.Tensor] = None,
     K: Optional[th.Tensor] = None,
     Rt: Optional[th.Tensor] = None,
-    distortion_mode: Optional[Sequence[str]] = None,
+    distortion_mode: Optional[List[str]] = None,
     distortion_coeff: Optional[th.Tensor] = None,
     fov: Optional[th.Tensor] = None,
 ) -> th.Tensor:
     """
-    v: Tensor, N x V x 3
-    Batch of vertex positions for vertices in the mesh.
+    Projects 3D vertex positions onto the image plane of the camera.
 
-    campos: Tensor, N x 3
-    Camera position.
+    Args:
+        v (th.Tensor):  vertex positions. N x V x 3
+        campos (Tensor): Camera position. N x 3
+        camrot (Tensor): Camera rotation matrix. N x 3 x 3
+        focal (Tensor): Focal length. The upper left 2x2 block of the intrinsic matrix [[f_x, s], [0, f_y]].  N x 2 x 2
+        princpt (Tensor): Camera principal point [cx, cy]. N x 2
+        K (Tensor): Camera intrinsic calibration matrix, N x 3 x 3
+        Rt (Tensor): Camera extrinsic matrix. N x 3 x 4 or N x 4 x 4
+        distortion_mode (List[str]): Names of the distortion modes.
+        distortion_coeff (Tensor): Distortion coefficients. N x 4
+        fov (Tensor): Valid field of view of the distortion model. N x 1
 
-    camrot: Tensor, N x 3 x 3
-    Camera rotation matrix.
+    Returns:
+        Vertex positions projected onto the image plane of the camera. The last dimension has still size 3.
+        The first two components are the x and y coordinates on the image plane, and the z is z component of the vertex
+        positions in the camera frame. The latter is used for depth values that are written to the z-buffer. N x V x 3
 
-    focal: Tensor, N x 2 x 2
-    Focal length [[fx, 0],
-                  [0, fy]]
+    .. warning::
+        Either ``K`` should be specified, or ``focal`` and ``princpt``.
+        Either ``Rt`` should be specified, or ``campos`` and ``camrot``.
 
-    princpt: Tensor, N x 2
-    Principal point [cx, cy]
-
-    K: Tensor, N x 3 x 3
-    Camera intrinsic calibration matrix. Either this or both (focal,
-    princpt) must be provided.
-
-    Rt: Tensor, N x 3 x 4 or N x 4 x 4
-    Camera extrinsic matrix. Either this or both (camrot, campos) must be
-    provided. Camrot is the upper 3x3 of Rt, campos = -R.T @ t.
-
-    distortion_mode: List[str]
-    Names of the distortion modes.
-
-    distortion_coeff: Tensor, N x 4
-    Distortion coefficients.
-
-    fov: Tensor, N x 1
-    Valid field of view of the distortion model.
+    .. note::
+        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of shape N x 3 x 1, then:
+        ``camrot`` is ``R``, and ``campos`` is ``-R.T @ t``.
 
     """
 
@@ -73,7 +67,7 @@ def transform_with_v_cam(
     princpt: Optional[th.Tensor] = None,
     K: Optional[th.Tensor] = None,
     Rt: Optional[th.Tensor] = None,
-    distortion_mode: Optional[Sequence[str]] = None,
+    distortion_mode: Optional[List[str]] = None,
     distortion_coeff: Optional[th.Tensor] = None,
     fov: Optional[th.Tensor] = None,
 ) -> Tuple[th.Tensor, th.Tensor]:
