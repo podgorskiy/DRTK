@@ -75,7 +75,7 @@ def edge_grad_estimator(
             - Color mapping
             - Color correction, gamma correction
             - Anything that would be indistinguishable from processing fragments independently
-            before their values get assigned to pixels of ``img``
+              before their values get assigned to pixels of ``img``
 
         Operations that **must be avoided** before `edge_grad_estimator` include:
             - Gaussian blur
