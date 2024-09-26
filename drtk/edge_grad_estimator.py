@@ -69,8 +69,8 @@ def edge_grad_estimator(
         `edge_grad_estimator`. That stems from the requirement that ``bary_img`` and ``index_img``
         must correspond exactly to the rasterized image ``img``. That means that the location of all
         discontinuities is controlled by ``v_pix`` and can be modified by modifing ``v_pix``.
-        Operations that are allowed, as long as they are differentiable, include:
 
+        Operations that are allowed, as long as they are differentiable, include:
             - Pixel-wise MLP
             - Color mapping
             - Color correction, gamma correction
