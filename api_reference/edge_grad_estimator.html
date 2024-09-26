@@ -468,10 +468,9 @@ computing losses</p>
 <p>It is crucial not to spatially modify the rasterized image before passing it to
 <cite>edge_grad_estimator</cite>. That stems from the requirement that <code class="docutils literal notranslate"><span class="pre">bary_img</span></code> and <code class="docutils literal notranslate"><span class="pre">index_img</span></code>
 must correspond exactly to the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code>. That means that the location of all
-discontinuities is controlled by <code class="docutils literal notranslate"><span class="pre">v_pix</span></code> and can be modified by modifing <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.
-Operations that are allowed, as long as they are differentiable, include:</p>
-<blockquote>
-<div><ul class="simple">
+discontinuities is controlled by <code class="docutils literal notranslate"><span class="pre">v_pix</span></code> and can be modified by modifing <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p>
+<dl class="simple">
+<dt>Operations that are allowed, as long as they are differentiable, include:</dt><dd><ul class="simple">
 <li><p>Pixel-wise MLP</p></li>
 <li><p>Color mapping</p></li>
 <li><p>Color correction, gamma correction</p></li>
@@ -481,8 +480,7 @@ Operations that are allowed, as long as they are differentiable, include:</p>
 </dl>
 </li>
 </ul>
-</div></blockquote>
-<dl class="simple">
+</dd>
 <dt>Operations that <strong>must be avoided</strong> before <cite>edge_grad_estimator</cite> include:</dt><dd><ul class="simple">
 <li><p>Gaussian blur</p></li>
 <li><p>Warping or deformation</p></li>
