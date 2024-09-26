@@ -7,16 +7,12 @@ from typing import Callable, Optional, Tuple
 
 import torch as th
 import torch.nn.functional as thf
+from drtk import edge_grad_ext
 from drtk.interpolate import interpolate
 from drtk.utils import index
 
-try:
-    from drtk import edge_grad_ext
-    th.ops.load_library(edge_grad_ext.__file__)
-except ImportError as e:
-    import sys
-    if 'sphinx' not in sys.modules:
-        raise e
+
+th.ops.load_library(edge_grad_ext.__file__)
 
 
 @th.compiler.disable
@@ -74,8 +70,8 @@ def edge_grad_estimator(
             - Pixel-wise MLP
             - Color mapping
             - Color correction, gamma correction
-            - Anything that would be indistinguashable from processing fragments independently
-                before their values get assigned to pixels of ``img``
+            - Anything that would be indistinguishable from processing fragments independently
+            before their values get assigned to pixels of ``img``
 
         Operations that **must be avoided** before `edge_grad_estimator` include:
             - Gaussian blur
