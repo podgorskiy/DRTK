@@ -89,7 +89,7 @@ def edge_grad_estimator(
         All sorts of clipping and clamping (e.g., `x.clamp(min=0.0, max=1.0)`) must also be done
         before invoking this function.
 
-    Usage::
+    Usage Example::
 
         import torch.nn.functional as thf
         from drtk import transform, rasterize, render, interpolate, edge_grad_estimator
