@@ -455,59 +455,80 @@ is None.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>returns the img argument unchanged. Optionally also returns computed
-v_pix_img. Your loss should use the returned img, even though it is
-unchanged.</p>
+<dd class="field-even"><p>Returns the input <code class="docutils literal notranslate"><span class="pre">img</span></code> unchanged. However, the returned image now has added
+differentiability at visibility discontinuities. This returned image should be used for
+computing losses</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
 </dd>
 </dl>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>It is important to not spatially modify the rasterized image before passing it to edge_grad_estimator.
-Any operation as long as it is differentiable is ok after the edge_grad_estimator.</p>
-<p>Examples of opeartions that can be done before edge_grad_estimator:</p>
+<p>It is crucial not to spatially modify the rasterized image before passing it to
+<cite>edge_grad_estimator</cite>. That stems from the requirement that <code class="docutils literal notranslate"><span class="pre">bary_img</span></code> and <code class="docutils literal notranslate"><span class="pre">index_img</span></code>
+must correspond exactly to the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code>. That means that the location of all
+discontinuities is controlled by <code class="docutils literal notranslate"><span class="pre">v_pix</span></code> and can be modified by modifing <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.
+Operations that are allowed, as long as they are differentiable, include:</p>
 <blockquote>
 <div><ul class="simple">
 <li><p>Pixel-wise MLP</p></li>
 <li><p>Color mapping</p></li>
 <li><p>Color correction, gamma correction</p></li>
+<li><dl class="simple">
+<dt>Anything that would be indistinguashable from processing fragments independently</dt><dd><p>before their values get assigned to pixels of <code class="docutils literal notranslate"><span class="pre">img</span></code></p>
+</dd>
+</dl>
+</li>
 </ul>
 </div></blockquote>
-<p>If the operation is significantly non-linear, then it is recommended to do it before
-edge_grad_estimator. All sorts of clipping and clamping (e.g. <cite>x.clamp(min=0.0, max=1.0)</cite>), must be
-done before edge_grad_estimator.</p>
-<p>Examples of operations that are not allowed before edge_grad_estimator:</p>
-<blockquote>
-<div><ul class="simple">
+<dl class="simple">
+<dt>Operations that <strong>must be avoided</strong> before <cite>edge_grad_estimator</cite> include:</dt><dd><ul class="simple">
 <li><p>Gaussian blur</p></li>
-<li><p>Warping, deformation</p></li>
-<li><p>Masking, cropping, making holes.</p></li>
+<li><p>Warping or deformation</p></li>
+<li><p>Masking, cropping, or introducing holes</p></li>
 </ul>
+</dd>
+</dl>
+<p>There is however, no issue with appling them after <cite>edge_grad_estimator</cite>.</p>
+<p>If the operation is highly non-linear, it is recommended to perform it before calling
+<a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-func docutils literal notranslate"><span class="pre">edge_grad_estimator()</span></code></a>.
+All sorts of clipping and clamping (e.g., <cite>x.clamp(min=0.0, max=1.0)</cite>) must also be done
+before invoking this function.</p>
+</div>
+<p>Usage Example:</p>
+<blockquote>
+<div><p>import torch.nn.functional as thf
+from drtk import transform, rasterize, render, interpolate, edge_grad_estimator</p>
+<p>v_pix = transform(v, tex, campos, camrot, focal, princpt)
+index_img = rasterize(v_pix, vi, width=512, height=512)
+_, bary_img = render(v_pix, vi, index_img)
+vt_img = interpolate(vt, vti, index_img, bary_img)</p>
+<dl class="simple">
+<dt>img = thf.grid_sample(</dt><dd><p>tex,
+vt_img.permute(0, 2, 3, 1),
+mode=”bilinear”,
+padding_mode=”border”,
+align_corners=False</p>
+</dd>
+</dl>
+<p>)</p>
+<p>mask = (index_img != -1)[:, None, :, :]</p>
+<p>img = img * mask</p>
+<dl class="simple">
+<dt>img = edge_grad_estimator(</dt><dd><p>v_pix=v_pix,
+vi=vi,
+bary_img=bary_img,
+img=img,
+index_img=index_img</p>
+</dd>
+</dl>
+<p>)</p>
+<p>optim.zero_grad()
+image_loss = loss_func(img, img_gt)
+image_loss.backward()
+optim.step()</p>
 </div></blockquote>
-</div>
-<p>Usage:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">drtk.renderlayer</span> <span class="kn">import</span> <span class="n">edge_grad_estimator</span>
-
-<span class="o">...</span>
-
-<span class="n">out</span> <span class="o">=</span> <span class="n">renderlayer</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tex</span><span class="p">,</span> <span class="n">campos</span><span class="p">,</span> <span class="n">camrot</span><span class="p">,</span> <span class="n">focal</span><span class="p">,</span> <span class="n">princpt</span><span class="p">,</span>
-         <span class="n">output_filters</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;index_img&quot;</span><span class="p">,</span> <span class="s2">&quot;render&quot;</span><span class="p">,</span> <span class="s2">&quot;mask&quot;</span><span class="p">,</span> <span class="s2">&quot;bary_img&quot;</span><span class="p">,</span> <span class="s2">&quot;v_pix&quot;</span><span class="p">])</span>
-
-<span class="n">img</span> <span class="o">=</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;render&quot;</span><span class="p">]</span> <span class="o">*</span> <span class="n">out</span><span class="p">[</span><span class="s2">&quot;mask&quot;</span><span class="p">]</span>
-
-<span class="n">img</span> <span class="o">=</span> <span class="n">edge_grad_estimator</span><span class="p">(</span>
-    <span class="n">v_pix</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;v_pix&quot;</span><span class="p">],</span>
-    <span class="n">vi</span><span class="o">=</span><span class="n">rl</span><span class="o">.</span><span class="n">vi</span><span class="p">,</span>
-    <span class="n">bary_img</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;bary_img&quot;</span><span class="p">],</span>
-    <span class="n">img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
-    <span class="n">index_img</span><span class="o">=</span><span class="n">out</span><span class="p">[</span><span class="s2">&quot;index_img&quot;</span><span class="p">]</span>
-<span class="p">)</span>
-
-<span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
-<span class="n">image_loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">img_gt</span><span class="p">)</span>
-<span class="n">image_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
-<span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
-</pre></div>
-</div>
 </dd></dl>
 
 <dl class="py function">

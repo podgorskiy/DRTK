@@ -410,7 +410,8 @@ document.write(`
 <span class="sd">        v (th.Tensor):  vertex positions. N x V x 3</span>
 <span class="sd">        campos (Tensor): Camera position. N x 3</span>
 <span class="sd">        camrot (Tensor): Camera rotation matrix. N x 3 x 3</span>
-<span class="sd">        focal (Tensor): Focal length. The upper left 2x2 block of the intrinsic matrix [[f_x, s], [0, f_y]].  N x 2 x 2</span>
+<span class="sd">        focal (Tensor): Focal length. The upper left 2x2 block of the intrinsic matrix</span>
+<span class="sd">            [[f_x, s], [0, f_y]].  N x 2 x 2</span>
 <span class="sd">        princpt (Tensor): Camera principal point [cx, cy]. N x 2</span>
 <span class="sd">        K (Tensor): Camera intrinsic calibration matrix, N x 3 x 3</span>
 <span class="sd">        Rt (Tensor): Camera extrinsic matrix. N x 3 x 4 or N x 4 x 4</span>
@@ -419,18 +420,21 @@ document.write(`
 <span class="sd">        fov (Tensor): Valid field of view of the distortion model. N x 1</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        Vertex positions projected onto the image plane of the camera. The last dimension has still size 3.</span>
-<span class="sd">        The first two components are the x and y coordinates on the image plane, and the z is z component of the vertex</span>
-<span class="sd">        positions in the camera frame. The latter is used for depth values that are written to the z-buffer. N x V x 3</span>
+<span class="sd">        Vertex positions projected onto the image plane of the camera. The last dimension has</span>
+<span class="sd">        still size 3. The first two components are the x and y coordinates on the image plane,</span>
+<span class="sd">        and the z is z component of the vertex positions in the camera frame. The latter is used</span>
+<span class="sd">        for depth values that are written to the z-buffer. N x V x 3</span>
 
 <span class="sd">    .. warning::</span>
-<span class="sd">        You must specify either ``K`` (intrinsic matrix) or both ``focal`` and ``princpt`` (focal length and principal point).</span>
+<span class="sd">        You must specify either ``K`` (intrinsic matrix) or both ``focal`` and ``princpt``</span>
+<span class="sd">        (focal length and principal point).</span>
 
-<span class="sd">        Additionally, you must provide either ``Rt`` (extrinsic matrix) or both ``campos`` (camera position) and ``camrot`` (camera rotation).</span>
+<span class="sd">        Additionally, you must provide either ``Rt`` (extrinsic matrix) or both ``campos``</span>
+<span class="sd">        (camera position) and ``camrot`` (camera rotation).</span>
 
 <span class="sd">    .. note::</span>
-<span class="sd">        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of shape N x 3 x 1, then:</span>
-<span class="sd">        ``camrot`` is ``R``, and ``campos`` is ``-R.T @ t``.</span>
+<span class="sd">        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of</span>
+<span class="sd">        shape N x 3 x 1, then: ``camrot`` is ``R``, and ``campos`` is ``-R.T @ t``.</span>
 
 <span class="sd">    &quot;&quot;&quot;</span>
 

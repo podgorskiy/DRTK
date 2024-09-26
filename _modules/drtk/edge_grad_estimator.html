@@ -442,47 +442,63 @@ document.write(`
 <span class="sd">            is None.</span>
 
 <span class="sd">    Returns:</span>
-<span class="sd">        returns the img argument unchanged. Optionally also returns computed</span>
-<span class="sd">        v_pix_img. Your loss should use the returned img, even though it is</span>
-<span class="sd">        unchanged.</span>
+<span class="sd">        Tensor: Returns the input ``img`` unchanged. However, the returned image now has added</span>
+<span class="sd">        differentiability at visibility discontinuities. This returned image should be used for</span>
+<span class="sd">        computing losses</span>
 
 <span class="sd">    Note:</span>
-<span class="sd">        It is important to not spatially modify the rasterized image before passing it to edge_grad_estimator.</span>
-<span class="sd">        Any operation as long as it is differentiable is ok after the edge_grad_estimator.</span>
-
-<span class="sd">        Examples of opeartions that can be done before edge_grad_estimator:</span>
+<span class="sd">        It is crucial not to spatially modify the rasterized image before passing it to</span>
+<span class="sd">        `edge_grad_estimator`. That stems from the requirement that ``bary_img`` and ``index_img``</span>
+<span class="sd">        must correspond exactly to the rasterized image ``img``. That means that the location of all</span>
+<span class="sd">        discontinuities is controlled by ``v_pix`` and can be modified by modifing ``v_pix``.</span>
+<span class="sd">        Operations that are allowed, as long as they are differentiable, include:</span>
 
 <span class="sd">            - Pixel-wise MLP</span>
 <span class="sd">            - Color mapping</span>
 <span class="sd">            - Color correction, gamma correction</span>
+<span class="sd">            - Anything that would be indistinguashable from processing fragments independently</span>
+<span class="sd">                before their values get assigned to pixels of ``img``</span>
 
-<span class="sd">        If the operation is significantly non-linear, then it is recommended to do it before</span>
-<span class="sd">        edge_grad_estimator. All sorts of clipping and clamping (e.g. `x.clamp(min=0.0, max=1.0)`), must be</span>
-<span class="sd">        done before edge_grad_estimator.</span>
-
-<span class="sd">        Examples of operations that are not allowed before edge_grad_estimator:</span>
-
+<span class="sd">        Operations that **must be avoided** before `edge_grad_estimator` include:</span>
 <span class="sd">            - Gaussian blur</span>
-<span class="sd">            - Warping, deformation</span>
-<span class="sd">            - Masking, cropping, making holes.</span>
+<span class="sd">            - Warping or deformation</span>
+<span class="sd">            - Masking, cropping, or introducing holes</span>
 
-<span class="sd">    Usage::</span>
+<span class="sd">        There is however, no issue with appling them after `edge_grad_estimator`.</span>
 
-<span class="sd">        from drtk.renderlayer import edge_grad_estimator</span>
+<span class="sd">        If the operation is highly non-linear, it is recommended to perform it before calling</span>
+<span class="sd">        :func:`edge_grad_estimator`.</span>
+<span class="sd">        All sorts of clipping and clamping (e.g., `x.clamp(min=0.0, max=1.0)`) must also be done</span>
+<span class="sd">        before invoking this function.</span>
 
-<span class="sd">        ...</span>
+<span class="sd">    Usage Example:</span>
 
-<span class="sd">        out = renderlayer(v, tex, campos, camrot, focal, princpt,</span>
-<span class="sd">                 output_filters=[&quot;index_img&quot;, &quot;render&quot;, &quot;mask&quot;, &quot;bary_img&quot;, &quot;v_pix&quot;])</span>
+<span class="sd">        import torch.nn.functional as thf</span>
+<span class="sd">        from drtk import transform, rasterize, render, interpolate, edge_grad_estimator</span>
 
-<span class="sd">        img = out[&quot;render&quot;] * out[&quot;mask&quot;]</span>
+<span class="sd">        v_pix = transform(v, tex, campos, camrot, focal, princpt)</span>
+<span class="sd">        index_img = rasterize(v_pix, vi, width=512, height=512)</span>
+<span class="sd">        _, bary_img = render(v_pix, vi, index_img)</span>
+<span class="sd">        vt_img = interpolate(vt, vti, index_img, bary_img)</span>
+
+<span class="sd">        img = thf.grid_sample(</span>
+<span class="sd">            tex,</span>
+<span class="sd">            vt_img.permute(0, 2, 3, 1),</span>
+<span class="sd">            mode=&quot;bilinear&quot;,</span>
+<span class="sd">            padding_mode=&quot;border&quot;,</span>
+<span class="sd">            align_corners=False</span>
+<span class="sd">        )</span>
+
+<span class="sd">        mask = (index_img != -1)[:, None, :, :]</span>
+
+<span class="sd">        img = img * mask</span>
 
 <span class="sd">        img = edge_grad_estimator(</span>
-<span class="sd">            v_pix=out[&quot;v_pix&quot;],</span>
-<span class="sd">            vi=rl.vi,</span>
-<span class="sd">            bary_img=out[&quot;bary_img&quot;],</span>
+<span class="sd">            v_pix=v_pix,</span>
+<span class="sd">            vi=vi,</span>
+<span class="sd">            bary_img=bary_img,</span>
 <span class="sd">            img=img,</span>
-<span class="sd">            index_img=out[&quot;index_img&quot;]</span>
+<span class="sd">            index_img=index_img</span>
 <span class="sd">        )</span>
 
 <span class="sd">        optim.zero_grad()</span>
