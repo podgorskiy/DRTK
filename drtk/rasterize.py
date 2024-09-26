@@ -8,9 +8,13 @@ from typing import Tuple
 
 import torch as th
 
-from drtk import rasterize_ext
-
-th.ops.load_library(rasterize_ext.__file__)
+try:
+    from drtk import rasterize_ext
+    th.ops.load_library(rasterize_ext.__file__)
+except ImportError as e:
+    import sys
+    if 'sphinx' not in sys.modules:
+        raise e
 
 
 @th.compiler.disable
@@ -26,14 +30,14 @@ def rasterize(
 
     Args:
         v (th.Tensor):  vertex positions. The first two components are the projected vertex's location (x, y)
-        on the image plane. The coordinates of the top left corner are (-0.5, -0.5), and the coordinates of
-        the bottom right corner are (width - 0.5, height - 0.5). The z component is expected to be in the
-        camera space coordinate frame (before projection).
+            on the image plane. The coordinates of the top left corner are (-0.5, -0.5), and the coordinates of
+            the bottom right corner are (width - 0.5, height - 0.5). The z component is expected to be in the
+            camera space coordinate frame (before projection).
             N x V x 3
 
         vi (th.Tensor): face vertex index list tensor. The most significant nibble of vi is reserved for
-        controlling visibility of the edges in wireframe mode. In non-wireframe mode, content of the most
-        significant nibble of vi will be ignored.
+            controlling visibility of the edges in wireframe mode. In non-wireframe mode, content of the most
+            significant nibble of vi will be ignored.
             V x 3
 
         height (int): height of the image in pixels.
@@ -41,10 +45,10 @@ def rasterize(
         width (int): width of the image in pixels.
 
         wireframe (bool): If False (default), rasterizes triangles. If True, rasterizes lines, where the most
-        significant nibble of vi is reinterpreted as a bit field controlling the visibility of the edges. The
-        least significant bit controls the visibility of the first edge, the second bit controls the
-        visibility of the second edge, and the third bit controls the visibility of the third edge. This
-        limits the maximum number of vertices to 268435455.
+            significant nibble of vi is reinterpreted as a bit field controlling the visibility of the edges. The
+            least significant bit controls the visibility of the first edge, the second bit controls the
+            visibility of the second edge, and the third bit controls the visibility of the third edge. This
+            limits the maximum number of vertices to 268435455.
 
     Returns:
         The rasterized image of triangle indices which is represented with an index tensor of a shape
@@ -69,10 +73,10 @@ def rasterize_with_depth(
     wireframe: bool = False,
 ) -> Tuple[th.Tensor, th.Tensor]:
     """
-    Same as `rasterize` function, additionally returns depth image. Internally it uses the same implementation
+    Same as :func:`rasterize` function, additionally returns depth image. Internally it uses the same implementation
     as the rasterize function which still computes depth but does not return depth.
 
-    Notes:
+    Note:
         The function is not differentiable, including the depth output.
 
     The split is done intentionally to hide the depth image from the user as it is not differentiable which

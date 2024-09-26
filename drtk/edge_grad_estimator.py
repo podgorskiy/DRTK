@@ -8,12 +8,16 @@ from typing import Callable, Optional, Tuple
 
 import torch as th
 import torch.nn.functional as thf
-from drtk import edge_grad_ext
 from drtk.interpolate import interpolate
 from drtk.utils import index
 
-
-th.ops.load_library(edge_grad_ext.__file__)
+try:
+    from drtk import edge_grad_ext
+    th.ops.load_library(edge_grad_ext.__file__)
+except ImportError as e:
+    import sys
+    if 'sphinx' not in sys.modules:
+        raise e
 
 
 @th.compiler.disable
