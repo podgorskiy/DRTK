@@ -102,6 +102,22 @@ When using DRTK in academic projects, please cite:
 :maxdepth: 2
 :hidden:
 
+installation/index
+```
+
+```{toctree}
+:glob:
+:maxdepth: 2
+:hidden:
+
+tutorials/index
+```
+
+```{toctree}
+:glob:
+:maxdepth: 2
+:hidden:
+
 api_reference/index
 ```
 

@@ -28,10 +28,25 @@ def edge_grad_estimator(
     index_img: th.Tensor,
     v_pix_img_hook: Optional[Callable[[th.Tensor], None]] = None,
 ) -> th.Tensor:
-    """ Make ``img`` differentiable with respect to visibility discontinuities and propagate the gradient to ``v_pix``.
-    The function takes render ``img`` which could be either only differentiable with respect to continues component,
-    or it could be not differentiable at all. Assuming that the ``bary_img`` and ``index_img`` match the rendered image
-    ``img``, the function returns `img`` as is, but adds the differentiability of  discontinuities.
+    """Makes the rasterized image ``img`` differentiable at visibility discontinuities
+    and backpropagates the gradients to ``v_pix``.
+
+    This function takes a rasterized image ``img`` that is assumed to be differentiable at
+    continuous regions but not at discontinuities. In some cases, ``img`` may not be differentiable
+    at all. For example, if the image is a rendered segmentation mask, it remains constant at
+    continuous regions, making it non-differentiable. However, ``edge_grad_estimator`` can still
+    compute gradients at the discontinuities with respect to ``v_pix``.
+
+    The arguments ``bary_img`` and ``index_img`` must correspond exactly to the rasterized image
+    ``img``. Each pixel in ``img`` should correspond to a fragment originated prom primitive
+    specified by ``index_img`` and it should have barycentric coordinates specified by
+    ``bary_img``. This means that with a small change to ``v_pix``, the pixels in ``img`` should
+    change accordingly. A frequent mistake that violates this condition is applying a mask
+    to the rendered image to exclude unwanted regions, which leads to erroneous gradients.
+
+    The function returns the ``img`` unchanged but with added differentiability at the
+    discontinuities. Note that it is not necessary for the input ``img`` to require gradients,
+    but the returned ``img`` will always require gradients.
 
     Args:
         v_pix: (Tensor) Pixel-space vertex coordinates with preserved camera-space Z-values.
@@ -102,7 +117,10 @@ def edge_grad_estimator(
         optim.step()
     """
 
-    # Could use v_pix_img output from DRTK, but bary_img needs to be detached.
+    # TODO: avoid call to interpolate, use backward kernel of interpolate directly
+    # Doing so will make `edge_grad_estimator` zero-overhead in forward pass
+    # At the moment, value of `v_pix_img` is ignored, and only passed to
+    # edge_grad_estimator so that backward kernel can be called with the computed gradient.
     v_pix_img = interpolate(v_pix, vi, index_img, bary_img.detach())
 
     img = th.ops.edge_grad_ext.edge_grad_estimator(v_pix, v_pix_img, vi, img, index_img)
