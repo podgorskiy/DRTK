@@ -4,8 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 
 """
-``drtk.interpolate`` module provides functions for differentiable interpolation of vertex attributes across the
-fragments, e.i. pixels covered by the primitive.
+``drtk.interpolate`` module provides functions for differentiable interpolation of vertex
+attributes across the fragments, e.i. pixels covered by the primitive.
 """
 
 import torch as th

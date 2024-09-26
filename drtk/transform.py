@@ -28,7 +28,8 @@ def transform(
         v (th.Tensor):  vertex positions. N x V x 3
         campos (Tensor): Camera position. N x 3
         camrot (Tensor): Camera rotation matrix. N x 3 x 3
-        focal (Tensor): Focal length. The upper left 2x2 block of the intrinsic matrix [[f_x, s], [0, f_y]].  N x 2 x 2
+        focal (Tensor): Focal length. The upper left 2x2 block of the intrinsic matrix
+            [[f_x, s], [0, f_y]].  N x 2 x 2
         princpt (Tensor): Camera principal point [cx, cy]. N x 2
         K (Tensor): Camera intrinsic calibration matrix, N x 3 x 3
         Rt (Tensor): Camera extrinsic matrix. N x 3 x 4 or N x 4 x 4
@@ -37,18 +38,21 @@ def transform(
         fov (Tensor): Valid field of view of the distortion model. N x 1
 
     Returns:
-        Vertex positions projected onto the image plane of the camera. The last dimension has still size 3.
-        The first two components are the x and y coordinates on the image plane, and the z is z component of the vertex
-        positions in the camera frame. The latter is used for depth values that are written to the z-buffer. N x V x 3
+        Vertex positions projected onto the image plane of the camera. The last dimension has
+        still size 3. The first two components are the x and y coordinates on the image plane,
+        and the z is z component of the vertex positions in the camera frame. The latter is used
+        for depth values that are written to the z-buffer. N x V x 3
 
     .. warning::
-        You must specify either ``K`` (intrinsic matrix) or both ``focal`` and ``princpt`` (focal length and principal point).
+        You must specify either ``K`` (intrinsic matrix) or both ``focal`` and ``princpt``
+        (focal length and principal point).
 
-        Additionally, you must provide either ``Rt`` (extrinsic matrix) or both ``campos`` (camera position) and ``camrot`` (camera rotation).
+        Additionally, you must provide either ``Rt`` (extrinsic matrix) or both ``campos``
+        (camera position) and ``camrot`` (camera rotation).
 
     .. note::
-        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of shape N x 3 x 1, then:
-        ``camrot`` is ``R``, and ``campos`` is ``-R.T @ t``.
+        If we split ``Rt`` of shape N x 3 x 4 into ``R`` of shape N x 3 x 3 and ``t`` of
+        shape N x 3 x 1, then: ``camrot`` is ``R``, and ``campos`` is ``-R.T @ t``.
 
     """
 

@@ -60,47 +60,63 @@ def edge_grad_estimator(
             is None.
 
     Returns:
-        returns the img argument unchanged. Optionally also returns computed
-        v_pix_img. Your loss should use the returned img, even though it is
-        unchanged.
+        Tensor: Returns the input ``img`` unchanged. However, the returned image now has added
+        differentiability at visibility discontinuities. This returned image should be used for
+        computing losses
 
     Note:
-        It is important to not spatially modify the rasterized image before passing it to edge_grad_estimator.
-        Any operation as long as it is differentiable is ok after the edge_grad_estimator.
-
-        Examples of opeartions that can be done before edge_grad_estimator:
+        It is crucial not to spatially modify the rasterized image before passing it to
+        `edge_grad_estimator`. That stems from the requirement that ``bary_img`` and ``index_img``
+        must correspond exactly to the rasterized image ``img``. That means that the location of all
+        discontinuities is controlled by ``v_pix`` and can be modified by modifing ``v_pix``.
+        Operations that are allowed, as long as they are differentiable, include:
 
             - Pixel-wise MLP
             - Color mapping
             - Color correction, gamma correction
+            - Anything that would be indistinguashable from processing fragments independently
+                before their values get assigned to pixels of ``img``
 
-        If the operation is significantly non-linear, then it is recommended to do it before
-        edge_grad_estimator. All sorts of clipping and clamping (e.g. `x.clamp(min=0.0, max=1.0)`), must be
-        done before edge_grad_estimator.
-
-        Examples of operations that are not allowed before edge_grad_estimator:
-
+        Operations that **must be avoided** before `edge_grad_estimator` include:
             - Gaussian blur
-            - Warping, deformation
-            - Masking, cropping, making holes.
+            - Warping or deformation
+            - Masking, cropping, or introducing holes
 
-    Usage::
+        There is however, no issue with appling them after `edge_grad_estimator`.
 
-        from drtk.renderlayer import edge_grad_estimator
+        If the operation is highly non-linear, it is recommended to perform it before calling
+        :func:`edge_grad_estimator`.
+        All sorts of clipping and clamping (e.g., `x.clamp(min=0.0, max=1.0)`) must also be done
+        before invoking this function.
 
-        ...
+    Usage Example:
 
-        out = renderlayer(v, tex, campos, camrot, focal, princpt,
-                 output_filters=["index_img", "render", "mask", "bary_img", "v_pix"])
+        import torch.nn.functional as thf
+        from drtk import transform, rasterize, render, interpolate, edge_grad_estimator
 
-        img = out["render"] * out["mask"]
+        v_pix = transform(v, tex, campos, camrot, focal, princpt)
+        index_img = rasterize(v_pix, vi, width=512, height=512)
+        _, bary_img = render(v_pix, vi, index_img)
+        vt_img = interpolate(vt, vti, index_img, bary_img)
+
+        img = thf.grid_sample(
+            tex,
+            vt_img.permute(0, 2, 3, 1),
+            mode="bilinear",
+            padding_mode="border",
+            align_corners=False
+        )
+
+        mask = (index_img != -1)[:, None, :, :]
+
+        img = img * mask
 
         img = edge_grad_estimator(
-            v_pix=out["v_pix"],
-            vi=rl.vi,
-            bary_img=out["bary_img"],
+            v_pix=v_pix,
+            vi=vi,
+            bary_img=bary_img,
             img=img,
-            index_img=out["index_img"]
+            index_img=index_img
         )
 
         optim.zero_grad()
