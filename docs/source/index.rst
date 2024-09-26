@@ -14,21 +14,21 @@ The package consists of five main modules:
 * :doc:`api_reference/interpolate`
 * :doc:`api_reference/edge_grad_estimator`
 
-
-.. toctree::
-   :glob:
-   :maxdepth: 2
-   :hidden:
-
-   installation/index
-
-
-.. toctree::
-   :glob:
-   :maxdepth: 2
-   :hidden:
-
-   examples/index
+..
+.. .. toctree::
+..    :glob:
+..    :maxdepth: 2
+..    :hidden:
+..
+..    installation/index
+..
+..
+.. .. toctree::
+..    :glob:
+..    :maxdepth: 2
+..    :hidden:
+..
+..    examples/index
 
 .. toctree::
    :glob:
