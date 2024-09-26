@@ -494,39 +494,43 @@ discontinuities is controlled by <code class="docutils literal notranslate"><spa
 All sorts of clipping and clamping (e.g., <cite>x.clamp(min=0.0, max=1.0)</cite>) must also be done
 before invoking this function.</p>
 </div>
-<p>Usage Example:</p>
-<blockquote>
-<div><p>import torch.nn.functional as thf
-from drtk import transform, rasterize, render, interpolate, edge_grad_estimator</p>
-<p>v_pix = transform(v, tex, campos, camrot, focal, princpt)
-index_img = rasterize(v_pix, vi, width=512, height=512)
-_, bary_img = render(v_pix, vi, index_img)
-vt_img = interpolate(vt, vti, index_img, bary_img)</p>
-<dl class="simple">
-<dt>img = thf.grid_sample(</dt><dd><p>tex,
-vt_img.permute(0, 2, 3, 1),
-mode=”bilinear”,
-padding_mode=”border”,
-align_corners=False</p>
-</dd>
-</dl>
-<p>)</p>
-<p>mask = (index_img != -1)[:, None, :, :]</p>
-<p>img = img * mask</p>
-<dl class="simple">
-<dt>img = edge_grad_estimator(</dt><dd><p>v_pix=v_pix,
-vi=vi,
-bary_img=bary_img,
-img=img,
-index_img=index_img</p>
-</dd>
-</dl>
-<p>)</p>
-<p>optim.zero_grad()
-image_loss = loss_func(img, img_gt)
-image_loss.backward()
-optim.step()</p>
-</div></blockquote>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">thf</span>
+<span class="kn">from</span> <span class="nn">drtk</span> <span class="kn">import</span> <span class="n">transform</span><span class="p">,</span> <span class="n">rasterize</span><span class="p">,</span> <span class="n">render</span><span class="p">,</span> <span class="n">interpolate</span><span class="p">,</span> <span class="n">edge_grad_estimator</span>
+
+<span class="o">...</span>
+
+<span class="n">v_pix</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tex</span><span class="p">,</span> <span class="n">campos</span><span class="p">,</span> <span class="n">camrot</span><span class="p">,</span> <span class="n">focal</span><span class="p">,</span> <span class="n">princpt</span><span class="p">)</span>
+<span class="n">index_img</span> <span class="o">=</span> <span class="n">rasterize</span><span class="p">(</span><span class="n">v_pix</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">bary_img</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">v_pix</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">index_img</span><span class="p">)</span>
+<span class="n">vt_img</span> <span class="o">=</span> <span class="n">interpolate</span><span class="p">(</span><span class="n">vt</span><span class="p">,</span> <span class="n">vti</span><span class="p">,</span> <span class="n">index_img</span><span class="p">,</span> <span class="n">bary_img</span><span class="p">)</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">thf</span><span class="o">.</span><span class="n">grid_sample</span><span class="p">(</span>
+    <span class="n">tex</span><span class="p">,</span>
+    <span class="n">vt_img</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;bilinear&quot;</span><span class="p">,</span>
+    <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;border&quot;</span><span class="p">,</span>
+    <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">index_img</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">*</span> <span class="n">mask</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">edge_grad_estimator</span><span class="p">(</span>
+    <span class="n">v_pix</span><span class="o">=</span><span class="n">v_pix</span><span class="p">,</span>
+    <span class="n">vi</span><span class="o">=</span><span class="n">vi</span><span class="p">,</span>
+    <span class="n">bary_img</span><span class="o">=</span><span class="n">bary_img</span><span class="p">,</span>
+    <span class="n">img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
+    <span class="n">index_img</span><span class="o">=</span><span class="n">index_img</span>
+<span class="p">)</span>
+
+<span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+<span class="n">image_loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">img_gt</span><span class="p">)</span>
+<span class="n">image_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
 </dd></dl>
 
 <dl class="py function">

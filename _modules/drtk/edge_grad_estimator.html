@@ -471,10 +471,12 @@ document.write(`
 <span class="sd">        All sorts of clipping and clamping (e.g., `x.clamp(min=0.0, max=1.0)`) must also be done</span>
 <span class="sd">        before invoking this function.</span>
 
-<span class="sd">    Usage Example:</span>
+<span class="sd">    Usage::</span>
 
 <span class="sd">        import torch.nn.functional as thf</span>
 <span class="sd">        from drtk import transform, rasterize, render, interpolate, edge_grad_estimator</span>
+
+<span class="sd">        ...</span>
 
 <span class="sd">        v_pix = transform(v, tex, campos, camrot, focal, princpt)</span>
 <span class="sd">        index_img = rasterize(v_pix, vi, width=512, height=512)</span>
