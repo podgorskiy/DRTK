@@ -232,6 +232,10 @@ document.write(`
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -406,6 +410,38 @@ document.write(`
                   
   <section id="drtk-msi">
 <h1>drtk.msi<a class="headerlink" href="#drtk-msi" title="Link to this heading">#</a></h1>
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.msi">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">msi</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ray_o</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ray_d</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">texture</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sub_step_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_inv_r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_inv_r</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">stop_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1e-07</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/msi.html#msi"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.msi" title="Link to this definition">#</a></dt>
+<dd><p>Renders a Multi-Sphere Image which is similar to the one described in “NeRF++: Analyzing and Improving
+Neural Radiance Fields”
+The implementation performs bilinear sampling in the spatial dimensions of each layer and cubic between
+the layers.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ray_o</strong> (<em>th.Tensor</em>) – Ray origins [N x 3]</p></li>
+<li><p><strong>ray_d</strong> (<em>th.Tensor</em>) – Ray directions [N x 3]</p></li>
+<li><p><strong>texture</strong> (<em>th.Tensor</em>) – The MSI texture [L x 4 x H x W], where L - number of layers.
+The first 3 channels are the color channels, and the fourth one is the sigma (transmittance)
+channel (negative log of alpha).</p></li>
+<li><p><strong>sub_step_count</strong> (<em>int</em><em>, </em><em>optional</em>) – Rate of the subsampling of the layers. Default is 2.</p></li>
+<li><p><strong>min_inv_r</strong> (<em>float</em><em>, </em><em>optional</em>) – Inverse of the minimum sphere radius. Default is 1 for unit radius.</p></li>
+<li><p><strong>max_inv_r</strong> (<em>float</em><em>, </em><em>optional</em>) – Inverse of the maximum sphere radius. Default is 0 for infinite radius.</p></li>
+<li><p><strong>stop_thresh</strong> (<em>bool</em><em>, </em><em>optional</em>) – The threshold for early ray termination when the accumulated
+transmittance goes beyond the specified value.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Result of the sampled MSI. First three channels are the color channels, and the 4th
+one is sigma (transmittance). [N x 4]</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>output (Tensor)</p>
+</dd>
+</dl>
+</dd></dl>
+
 </section>
 
 
@@ -418,6 +454,23 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.msi"><code class="docutils literal notranslate"><span class="pre">msi()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

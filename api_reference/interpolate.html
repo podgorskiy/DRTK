@@ -232,6 +232,10 @@ document.write(`
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -406,11 +410,55 @@ document.write(`
                   
   <section id="drtk-interpolate">
 <h1>drtk.interpolate<a class="headerlink" href="#drtk-interpolate" title="Link to this heading">#</a></h1>
+<p><code class="docutils literal notranslate"><span class="pre">drtk.interpolate</span></code> module provides functions for differentiable interpolation of vertex
+attributes across the fragments, e.i. pixels covered by the primitive.</p>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.interpolate" title="drtk.interpolate"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate</span></code></a></p></td>
+<td><p>Performs a linear interpolation of the vertex attributes given the barycentric coordinates</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drtk.interpolate_ref" title="drtk.interpolate_ref"><code class="xref py py-obj docutils literal notranslate"><span class="pre">interpolate_ref</span></code></a></p></td>
+<td><p>A reference implementation of <a class="reference internal" href="#drtk.interpolate" title="drtk.interpolate"><code class="xref py py-func docutils literal notranslate"><span class="pre">drtk.interpolate()</span></code></a> in pure PyTorch.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.interpolate">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">interpolate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vert_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bary_img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/interpolate.html#interpolate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.interpolate" title="Link to this definition">#</a></dt>
+<dd><p>Performs a linear interpolation of the vertex attributes given the barycentric coordinates</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>vert_attributes</strong> (<em>th.Tensor</em>) – vertex attribute tensor
+N x V x C</p></li>
+<li><p><strong>vi</strong> (<em>th.Tensor</em>) – face vertex index list tensor
+V x 3</p></li>
+<li><p><strong>index_img</strong> (<em>th.Tensor</em>) – index image tensor
+N x H x W</p></li>
+<li><p><strong>bary_img</strong> (<em>th.Tensor</em>) – 3D barycentric coordinate image tensor
+N x 3 x H x W</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A tensor with interpolated vertex attributes with a shape [N, C, H, W]</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The returned tensor has only valid values for pixels which have a valid index in <code class="docutils literal notranslate"><span class="pre">index_img</span></code>.
+For all other pixels, which had index <code class="docutils literal notranslate"><span class="pre">-1</span></code> in <code class="docutils literal notranslate"><span class="pre">index_img</span></code>, the returned tensor will have non-zero
+values which should be ignored.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.interpolate_ref">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">interpolate_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">vert_attributes</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bary_img</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/interpolate.html#interpolate_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.interpolate_ref" title="Link to this definition">#</a></dt>
+<dd><p>A reference implementation of <a class="reference internal" href="#drtk.interpolate" title="drtk.interpolate"><code class="xref py py-func docutils literal notranslate"><span class="pre">drtk.interpolate()</span></code></a> in pure PyTorch.
+This function is used for tests only, please see <a class="reference internal" href="#drtk.interpolate" title="drtk.interpolate"><code class="xref py py-func docutils literal notranslate"><span class="pre">drtk.interpolate()</span></code></a> for documentation.</p>
+</dd></dl>
+
 </section>
 
 
@@ -423,6 +471,24 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.interpolate"><code class="docutils literal notranslate"><span class="pre">interpolate()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.interpolate_ref"><code class="docutils literal notranslate"><span class="pre">interpolate_ref()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

@@ -232,6 +232,10 @@ document.write(`
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -408,9 +412,131 @@ document.write(`
 <h1>drtk.edge_grad_estimator<a class="headerlink" href="#drtk-edge-grad-estimator" title="Link to this heading">#</a></h1>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_grad_estimator</span></code></a></p></td>
+<td><p>Makes the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code> differentiable at visibility discontinuities and backpropagates the gradients to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drtk.edge_grad_estimator_ref" title="drtk.edge_grad_estimator_ref"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_grad_estimator_ref</span></code></a></p></td>
+<td><p>Python reference implementation for <a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-func docutils literal notranslate"><span class="pre">drtk.edge_grad_estimator()</span></code></a>.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.edge_grad_estimator">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">edge_grad_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_pix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bary_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_pix_img_hook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/edge_grad_estimator.html#edge_grad_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.edge_grad_estimator" title="Link to this definition">#</a></dt>
+<dd><p>Makes the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code> differentiable at visibility discontinuities
+and backpropagates the gradients to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p>
+<p>This function takes a rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code> that is assumed to be differentiable at
+continuous regions but not at discontinuities. In some cases, <code class="docutils literal notranslate"><span class="pre">img</span></code> may not be differentiable
+at all. For example, if the image is a rendered segmentation mask, it remains constant at
+continuous regions, making it non-differentiable. However, <code class="docutils literal notranslate"><span class="pre">edge_grad_estimator</span></code> can still
+compute gradients at the discontinuities with respect to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p>
+<p>The arguments <code class="docutils literal notranslate"><span class="pre">bary_img</span></code> and <code class="docutils literal notranslate"><span class="pre">index_img</span></code> must correspond exactly to the rasterized image
+<code class="docutils literal notranslate"><span class="pre">img</span></code>. Each pixel in <code class="docutils literal notranslate"><span class="pre">img</span></code> should correspond to a fragment originated prom primitive
+specified by <code class="docutils literal notranslate"><span class="pre">index_img</span></code> and it should have barycentric coordinates specified by
+<code class="docutils literal notranslate"><span class="pre">bary_img</span></code>. This means that with a small change to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>, the pixels in <code class="docutils literal notranslate"><span class="pre">img</span></code> should
+change accordingly. A frequent mistake that violates this condition is applying a mask
+to the rendered image to exclude unwanted regions, which leads to erroneous gradients.</p>
+<p>The function returns the <code class="docutils literal notranslate"><span class="pre">img</span></code> unchanged but with added differentiability at the
+discontinuities. Note that it is not necessary for the input <code class="docutils literal notranslate"><span class="pre">img</span></code> to require gradients,
+but the returned <code class="docutils literal notranslate"><span class="pre">img</span></code> will always require gradients.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v_pix</strong> (<em>Tensor</em>) – Pixel-space vertex coordinates, preserving the original camera-space
+Z-values. Shape: <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>N</mi><mo separator="true">,</mo><mi>V</mi><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(N, V, 3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mclose">)</span></span></span></span></span>.</p></li>
+<li><p><strong>vi</strong> (<em>Tensor</em>) – Face vertex index list tensor. Shape: <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>V</mi><mo separator="true">,</mo><mn>3</mn><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(V, 3)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.22222em;">V</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mclose">)</span></span></span></span></span>.</p></li>
+<li><p><strong>bary_img</strong> (<em>Tensor</em>) – 3D barycentric coordinate image tensor. Shape: <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>N</mi><mo separator="true">,</mo><mn>3</mn><mo separator="true">,</mo><mi>H</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(N, 3, H, W)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord">3</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">)</span></span></span></span></span>.</p></li>
+<li><p><strong>img</strong> (<em>Tensor</em>) – The rendered image. Shape: <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>N</mi><mo separator="true">,</mo><mi>C</mi><mo separator="true">,</mo><mi>H</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(N, C, H, W)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.07153em;">C</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">)</span></span></span></span></span>.</p></li>
+<li><p><strong>index_img</strong> (<em>Tensor</em>) – Index image tensor. Shape: <span class="math"><span class="katex"><span class="katex-mathml"><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mo stretchy="false">(</mo><mi>N</mi><mo separator="true">,</mo><mi>H</mi><mo separator="true">,</mo><mi>W</mi><mo stretchy="false">)</mo></mrow><annotation encoding="application/x-tex">(N, H, W)</annotation></semantics></math></span><span class="katex-html" aria-hidden="true"><span class="base"><span class="strut" style="height:1em;vertical-align:-0.25em;"></span><span class="mopen">(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.08125em;">H</span><span class="mpunct">,</span><span class="mspace" style="margin-right:0.1667em;"></span><span class="mord mathnormal" style="margin-right:0.13889em;">W</span><span class="mclose">)</span></span></span></span></span>.</p></li>
+<li><p><strong>v_pix_img_hook</strong> (<em>Optional</em><em>[</em><em>Callable</em><em>[</em><em>[</em><em>th.Tensor</em><em>]</em><em>, </em><em>None</em><em>]</em><em>]</em>) – An optional backward hook that will
+be registered to <code class="docutils literal notranslate"><span class="pre">v_pix_img</span></code>. Useful for examining the generated image space. Default
+is None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Returns the input <code class="docutils literal notranslate"><span class="pre">img</span></code> unchanged. However, the returned image now has added
+differentiability at visibility discontinuities. This returned image should be used for
+computing losses</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Tensor</p>
+</dd>
+</dl>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>It is crucial not to spatially modify the rasterized image before passing it to
+<cite>edge_grad_estimator</cite>. That stems from the requirement that <code class="docutils literal notranslate"><span class="pre">bary_img</span></code> and <code class="docutils literal notranslate"><span class="pre">index_img</span></code>
+must correspond exactly to the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code>. That means that the location of all
+discontinuities is controlled by <code class="docutils literal notranslate"><span class="pre">v_pix</span></code> and can be modified by modifing <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p>
+<dl>
+<dt>Operations that are allowed, as long as they are differentiable, include:</dt><dd><ul class="simple">
+<li><p>Pixel-wise MLP</p></li>
+<li><p>Color mapping</p></li>
+<li><p>Color correction, gamma correction</p></li>
+<li><p>Anything that would be indistinguishable from processing fragments independently</p></li>
+</ul>
+<p>before their values get assigned to pixels of <code class="docutils literal notranslate"><span class="pre">img</span></code></p>
+</dd>
+<dt>Operations that <strong>must be avoided</strong> before <cite>edge_grad_estimator</cite> include:</dt><dd><ul class="simple">
+<li><p>Gaussian blur</p></li>
+<li><p>Warping or deformation</p></li>
+<li><p>Masking, cropping, or introducing holes</p></li>
+</ul>
+</dd>
+</dl>
+<p>There is however, no issue with appling them after <cite>edge_grad_estimator</cite>.</p>
+<p>If the operation is highly non-linear, it is recommended to perform it before calling
+<a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-func docutils literal notranslate"><span class="pre">edge_grad_estimator()</span></code></a>.
+All sorts of clipping and clamping (e.g., <cite>x.clamp(min=0.0, max=1.0)</cite>) must also be done
+before invoking this function.</p>
+</div>
+<p>Usage:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">thf</span>
+<span class="kn">from</span> <span class="nn">drtk</span> <span class="kn">import</span> <span class="n">transform</span><span class="p">,</span> <span class="n">rasterize</span><span class="p">,</span> <span class="n">render</span><span class="p">,</span> <span class="n">interpolate</span><span class="p">,</span> <span class="n">edge_grad_estimator</span>
+
+<span class="o">...</span>
+
+<span class="n">v_pix</span> <span class="o">=</span> <span class="n">transform</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">tex</span><span class="p">,</span> <span class="n">campos</span><span class="p">,</span> <span class="n">camrot</span><span class="p">,</span> <span class="n">focal</span><span class="p">,</span> <span class="n">princpt</span><span class="p">)</span>
+<span class="n">index_img</span> <span class="o">=</span> <span class="n">rasterize</span><span class="p">(</span><span class="n">v_pix</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">_</span><span class="p">,</span> <span class="n">bary_img</span> <span class="o">=</span> <span class="n">render</span><span class="p">(</span><span class="n">v_pix</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">index_img</span><span class="p">)</span>
+<span class="n">vt_img</span> <span class="o">=</span> <span class="n">interpolate</span><span class="p">(</span><span class="n">vt</span><span class="p">,</span> <span class="n">vti</span><span class="p">,</span> <span class="n">index_img</span><span class="p">,</span> <span class="n">bary_img</span><span class="p">)</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">thf</span><span class="o">.</span><span class="n">grid_sample</span><span class="p">(</span>
+    <span class="n">tex</span><span class="p">,</span>
+    <span class="n">vt_img</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>
+    <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;bilinear&quot;</span><span class="p">,</span>
+    <span class="n">padding_mode</span><span class="o">=</span><span class="s2">&quot;border&quot;</span><span class="p">,</span>
+    <span class="n">align_corners</span><span class="o">=</span><span class="kc">False</span>
+<span class="p">)</span>
+
+<span class="n">mask</span> <span class="o">=</span> <span class="p">(</span><span class="n">index_img</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)[:,</span> <span class="kc">None</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">img</span> <span class="o">*</span> <span class="n">mask</span>
+
+<span class="n">img</span> <span class="o">=</span> <span class="n">edge_grad_estimator</span><span class="p">(</span>
+    <span class="n">v_pix</span><span class="o">=</span><span class="n">v_pix</span><span class="p">,</span>
+    <span class="n">vi</span><span class="o">=</span><span class="n">vi</span><span class="p">,</span>
+    <span class="n">bary_img</span><span class="o">=</span><span class="n">bary_img</span><span class="p">,</span>
+    <span class="n">img</span><span class="o">=</span><span class="n">img</span><span class="p">,</span>
+    <span class="n">index_img</span><span class="o">=</span><span class="n">index_img</span>
+<span class="p">)</span>
+
+<span class="n">optim</span><span class="o">.</span><span class="n">zero_grad</span><span class="p">()</span>
+<span class="n">image_loss</span> <span class="o">=</span> <span class="n">loss_func</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">img_gt</span><span class="p">)</span>
+<span class="n">image_loss</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
+<span class="n">optim</span><span class="o">.</span><span class="n">step</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.edge_grad_estimator_ref">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">edge_grad_estimator_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_pix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bary_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_pix_img_hook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/edge_grad_estimator.html#edge_grad_estimator_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.edge_grad_estimator_ref" title="Link to this definition">#</a></dt>
+<dd><p>Python reference implementation for
+<a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-func docutils literal notranslate"><span class="pre">drtk.edge_grad_estimator()</span></code></a>.</p>
+</dd></dl>
+
 </section>
 
 
@@ -423,6 +549,24 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.edge_grad_estimator"><code class="docutils literal notranslate"><span class="pre">edge_grad_estimator()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.edge_grad_estimator_ref"><code class="docutils literal notranslate"><span class="pre">edge_grad_estimator_ref()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>

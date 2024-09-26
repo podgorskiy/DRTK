@@ -232,6 +232,10 @@ document.write(`
   
 
   
+    <button class="pst-navbar-icon sidebar-toggle secondary-toggle" aria-label="On this page">
+      <span class="fa-solid fa-outdent"></span>
+    </button>
+  
 </div>
 
     </header>
@@ -408,9 +412,63 @@ document.write(`
 <h1>drtk.transform<a class="headerlink" href="#drtk-transform" title="Link to this heading">#</a></h1>
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
+<tr class="row-odd"><td><p><a class="reference internal" href="#drtk.transform" title="drtk.transform"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform</span></code></a></p></td>
+<td><p>Projects 3D vertex positions onto the image plane of the camera.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#drtk.transform_with_v_cam" title="drtk.transform_with_v_cam"><code class="xref py py-obj docutils literal notranslate"><span class="pre">transform_with_v_cam</span></code></a></p></td>
+<td><p>Same as transform, but also returns the camera-space coordinates.</p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.transform">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">transform</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camrot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">princpt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/transform.html#transform"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.transform" title="Link to this definition">#</a></dt>
+<dd><p>Projects 3D vertex positions onto the image plane of the camera.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>v</strong> (<em>th.Tensor</em>) – vertex positions. N x V x 3</p></li>
+<li><p><strong>campos</strong> (<em>Tensor</em>) – Camera position. N x 3</p></li>
+<li><p><strong>camrot</strong> (<em>Tensor</em>) – Camera rotation matrix. N x 3 x 3</p></li>
+<li><p><strong>focal</strong> (<em>Tensor</em>) – Focal length. The upper left 2x2 block of the intrinsic matrix
+[[f_x, s], [0, f_y]].  N x 2 x 2</p></li>
+<li><p><strong>princpt</strong> (<em>Tensor</em>) – Camera principal point [cx, cy]. N x 2</p></li>
+<li><p><strong>K</strong> (<em>Tensor</em>) – Camera intrinsic calibration matrix, N x 3 x 3</p></li>
+<li><p><strong>Rt</strong> (<em>Tensor</em>) – Camera extrinsic matrix. N x 3 x 4 or N x 4 x 4</p></li>
+<li><p><strong>distortion_mode</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – Names of the distortion modes.</p></li>
+<li><p><strong>distortion_coeff</strong> (<em>Tensor</em>) – Distortion coefficients. N x 4</p></li>
+<li><p><strong>fov</strong> (<em>Tensor</em>) – Valid field of view of the distortion model. N x 1</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Vertex positions projected onto the image plane of the camera. The last dimension has
+still size 3. The first two components are the x and y coordinates on the image plane,
+and the z is z component of the vertex positions in the camera frame. The latter is used
+for depth values that are written to the z-buffer. N x V x 3</p>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>You must specify either <code class="docutils literal notranslate"><span class="pre">K</span></code> (intrinsic matrix) or both <code class="docutils literal notranslate"><span class="pre">focal</span></code> and <code class="docutils literal notranslate"><span class="pre">princpt</span></code>
+(focal length and principal point).</p>
+<p>Additionally, you must provide either <code class="docutils literal notranslate"><span class="pre">Rt</span></code> (extrinsic matrix) or both <code class="docutils literal notranslate"><span class="pre">campos</span></code>
+(camera position) and <code class="docutils literal notranslate"><span class="pre">camrot</span></code> (camera rotation).</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>If we split <code class="docutils literal notranslate"><span class="pre">Rt</span></code> of shape N x 3 x 4 into <code class="docutils literal notranslate"><span class="pre">R</span></code> of shape N x 3 x 3 and <code class="docutils literal notranslate"><span class="pre">t</span></code> of
+shape N x 3 x 1, then: <code class="docutils literal notranslate"><span class="pre">camrot</span></code> is <code class="docutils literal notranslate"><span class="pre">R</span></code>, and <code class="docutils literal notranslate"><span class="pre">campos</span></code> is <code class="docutils literal notranslate"><span class="pre">-R.T</span> <span class="pre">&#64;</span> <span class="pre">t</span></code>.</p>
+</div>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="drtk.transform_with_v_cam">
+<span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">transform_with_v_cam</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">campos</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">camrot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focal</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">princpt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">K</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">Rt</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distortion_coeff</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">fov</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/transform.html#transform_with_v_cam"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.transform_with_v_cam" title="Link to this definition">#</a></dt>
+<dd><p>Same as transform, but also returns the camera-space coordinates.
+In most cases it is not needed, but renderlayer depends on it</p>
+</dd></dl>
+
 </section>
 
 
@@ -423,6 +481,24 @@ document.write(`
             </div>
             
             
+              
+                <div class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+<div
+    id="pst-page-navigation-heading-2"
+    class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> On this page
+  </div>
+  <nav class="bd-toc-nav page-toc" aria-labelledby="pst-page-navigation-heading-2">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.transform"><code class="docutils literal notranslate"><span class="pre">transform()</span></code></a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#drtk.transform_with_v_cam"><code class="docutils literal notranslate"><span class="pre">transform_with_v_cam()</span></code></a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
