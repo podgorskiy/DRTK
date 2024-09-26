@@ -134,6 +134,20 @@
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
     DRTK API
@@ -247,6 +261,20 @@ document.write(`
 <nav>
   <ul class="bd-navbar-elements navbar-nav">
     
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../installation/index.html">
+    Installation
+  </a>
+</li>
+
+
+<li class="nav-item ">
+  <a class="nav-link nav-internal" href="../tutorials/index.html">
+    Tutorials
+  </a>
+</li>
+
+
 <li class="nav-item current active">
   <a class="nav-link nav-internal" href="index.html">
     DRTK API
@@ -385,7 +413,7 @@ document.write(`
 <div class="pst-scrollable-table-container"><table class="autosummary longtable table autosummary">
 <tbody>
 <tr class="row-odd"><td><p><a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_grad_estimator</span></code></a></p></td>
-<td><p>Make <code class="docutils literal notranslate"><span class="pre">img</span></code> differentiable with respect to visibility discontinuities and propagate the gradient to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p></td>
+<td><p>Makes the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code> differentiable at visibility discontinuities and backpropagates the gradients to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#drtk.edge_grad_estimator_ref" title="drtk.edge_grad_estimator_ref"><code class="xref py py-obj docutils literal notranslate"><span class="pre">edge_grad_estimator_ref</span></code></a></p></td>
 <td><p>Python reference implementation for <a class="reference internal" href="#drtk.edge_grad_estimator" title="drtk.edge_grad_estimator"><code class="xref py py-func docutils literal notranslate"><span class="pre">drtk.edge_grad_estimator()</span></code></a>.</p></td>
@@ -396,10 +424,22 @@ document.write(`
 <dl class="py function">
 <dt class="sig sig-object py" id="drtk.edge_grad_estimator">
 <span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">edge_grad_estimator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">v_pix</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vi</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bary_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">index_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">v_pix_img_hook</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/edge_grad_estimator.html#edge_grad_estimator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.edge_grad_estimator" title="Link to this definition">#</a></dt>
-<dd><p>Make <code class="docutils literal notranslate"><span class="pre">img</span></code> differentiable with respect to visibility discontinuities and propagate the gradient to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.
-The function takes render <code class="docutils literal notranslate"><span class="pre">img</span></code> which could be either only differentiable with respect to continues component,
-or it could be not differentiable at all. Assuming that the <code class="docutils literal notranslate"><span class="pre">bary_img</span></code> and <code class="docutils literal notranslate"><span class="pre">index_img</span></code> match the rendered image
-<code class="docutils literal notranslate"><span class="pre">img</span></code>, the function returns <cite>img`</cite> as is, but adds the differentiability of  discontinuities.</p>
+<dd><p>Makes the rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code> differentiable at visibility discontinuities
+and backpropagates the gradients to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p>
+<p>This function takes a rasterized image <code class="docutils literal notranslate"><span class="pre">img</span></code> that is assumed to be differentiable at
+continuous regions but not at discontinuities. In some cases, <code class="docutils literal notranslate"><span class="pre">img</span></code> may not be differentiable
+at all. For example, if the image is a rendered segmentation mask, it remains constant at
+continuous regions, making it non-differentiable. However, <code class="docutils literal notranslate"><span class="pre">edge_grad_estimator</span></code> can still
+compute gradients at the discontinuities with respect to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>.</p>
+<p>The arguments <code class="docutils literal notranslate"><span class="pre">bary_img</span></code> and <code class="docutils literal notranslate"><span class="pre">index_img</span></code> must correspond exactly to the rasterized image
+<code class="docutils literal notranslate"><span class="pre">img</span></code>. Each pixel in <code class="docutils literal notranslate"><span class="pre">img</span></code> should correspond to a fragment originated prom primitive
+specified by <code class="docutils literal notranslate"><span class="pre">index_img</span></code> and it should have barycentric coordinates specified by
+<code class="docutils literal notranslate"><span class="pre">bary_img</span></code>. This means that with a small change to <code class="docutils literal notranslate"><span class="pre">v_pix</span></code>, the pixels in <code class="docutils literal notranslate"><span class="pre">img</span></code> should
+change accordingly. A frequent mistake that violates this condition is applying a mask
+to the rendered image to exclude unwanted regions, which leads to erroneous gradients.</p>
+<p>The function returns the <code class="docutils literal notranslate"><span class="pre">img</span></code> unchanged but with added differentiability at the
+discontinuities. Note that it is not necessary for the input <code class="docutils literal notranslate"><span class="pre">img</span></code> to require gradients,
+but the returned <code class="docutils literal notranslate"><span class="pre">img</span></code> will always require gradients.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
