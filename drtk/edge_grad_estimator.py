@@ -49,23 +49,15 @@ def edge_grad_estimator(
     but the returned ``img`` will always require gradients.
 
     Args:
-        v_pix: (Tensor) Pixel-space vertex coordinates with preserved camera-space Z-values.
-            N x V x 3
-
-        vi: face vertex index list tensor
-            V x 3
-
-        bary_img: 3D barycentric coordinate image tensor
-            N x 3 x H x W
-
-        img: The rendered image
-            N x C x H x W
-
-        index_img: index image tensor
-            N x H x W
-
-        v_pix_img_hook: a backward hook that will be registered to v_pix_img. Useful for examining
-            generated image space. Default None
+        v_pix (Tensor): Pixel-space vertex coordinates, preserving the original camera-space
+            Z-values. Shape: :math:`(N, V, 3)`.
+        vi (Tensor): Face vertex index list tensor. Shape: :math:`(V, 3)`.
+        bary_img (Tensor): 3D barycentric coordinate image tensor. Shape: :math:`(N, 3, H, W)`.
+        img (Tensor): The rendered image. Shape: :math:`(N, C, H, W)`.
+        index_img (Tensor): Index image tensor. Shape: :math:`(N, H, W)`.
+        v_pix_img_hook (Optional[Callable[[th.Tensor], None]]): An optional backward hook that will
+            be registered to ``v_pix_img``. Useful for examining the generated image space. Default
+            is None.
 
     Returns:
         returns the img argument unchanged. Optionally also returns computed
