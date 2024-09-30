@@ -39,8 +39,11 @@ The easiest way to install DRTK is by using pip with the GitHub repository direc
 
     It may take significant amount of time to compile. The time could be 30 minutes or more.
 
-In most cases this should be enough, given that PyTorch,
-CUDA Toolkit, and Build Essentials for your platform are installed and environment is correctly configured.
+This should be enough in most cases, given that PyTorch, CUDA Toolkit, and Build Essentials for your platform
+are installed and the environment is correctly configured.
+
+
+.. _Specifying Architectures:
 
 Specifying Architectures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -60,16 +63,14 @@ or specify numerical values for architectures explicitly:
     # Add `+PTX` if you want also to save intermediate byte code for better compatibility.
     TORCH_CUDA_ARCH_LIST="8.0;8.6+PTX" install git+https://github.com/facebookresearch/DRTK.git
 
-Note: Both commands above achieve the same result.
-
 If ``TORCH_CUDA_ARCH_LIST`` is not specified, DRTK will build for the following architectures by default: 7.2, 7.5, 8.0, 8.6, 9.0.
 
-``TORCH_CUDA_ARCH_LIST`` can take one or more values from the list of supported named or numerical architectures.
-When combining values, use a semicolon `;` or space to combine numerical values, and the `+` symbol for combining named values.
+``TORCH_CUDA_ARCH_LIST`` can take one or more values from the supported named or numerical architectures list.
+When combining values, use a semicolon `;` or space to combine numerical values and the `+` symbol to combine named values.
 
-LIst of supported numerical values: ``'3.5', '3.7', '5.0', '5.2', '5.3', '6.0', '6.1', '6.2', '7.0', '7.2', '7.5', '8.0', '8.6', '8.7', '8.9', '9.0', '9.0a'``.
+List of numerical architectures values supported by PyTorch: ``'3.5', '3.7', '5.0', '5.2', '5.3', '6.0', '6.1', '6.2', '7.0', '7.2', '7.5', '8.0', '8.6', '8.7', '8.9', '9.0', '9.0a'``.
 
-Supported "named" architecture values are shown in the table below:
+The "named" architectures supported by PyTorch are listed in the table below:
 
 .. list-table:: Named architectures
    :header-rows: 1
@@ -101,14 +102,17 @@ Supported "named" architecture values are shown in the table below:
    * - Hopper
      - 9.0+PTX
 
+.. note::
+
+    We do not test the DRTK package on architectures before Volta.
 
 For more information about ``TORCH_CUDA_ARCH_LIST``, refer to the `PyTorch documentation <https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.CUDAExtension>`_ or view the `source code on GitHub <https://github.com/pytorch/pytorch/blob/c9653bf2ca6dd88b991d71abf836bd9a7a1d9dc3/torch/utils/cpp_extension.py#L1980>`_.
 
 Installing from a Cloned Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Alternatively, you can install the package from a local clone of the repository.
-This is useful if you need to make modifications to the package code.
+Alternatively, you can install the package from a local repository clone.
+It could be helpful if you need to modify the package code.
 
 Clone the repository and ``cd`` into it:
 
@@ -117,9 +121,9 @@ Clone the repository and ``cd`` into it:
     git clone https://github.com/facebookresearch/DRTK
     cd DRTK
 
-Then install package from path using ``pip``. Note the ``--no-build-isolation`` flag, it is needed for modern build
-system to disable building in a separate clean python environment.
-The reason is that it will install a default ``torch`` version from pip, which likely will not match the one already installed in the system (due to usage of ``--index-url ``).
+Then, install the package from the path using ``pip``. Note the ``--no-build-isolation`` flag, it is needed for modern build
+system to disable building in a separate, clean Python environment.
+The reason is that it will install a default ``torch`` version from pip, which likely will not match the one already installed in the system (due to usage of ``--index-url``).
 
 .. code-block:: shell
 
@@ -133,19 +137,19 @@ To build a wheel run:
 
 .. code-block:: shell
 
-    # You might need to install build first
+    # You might need to install `build` first
     # pip install --upgrade build
     python -m build --wheel --no-isolation
 
-Alternatively, you can use the deprecated CLI of setuptools:
+Alternatively, you can use the deprecated CLI of ``setuptools``:
 
 .. code-block:: shell
 
-    # You might need to install wheel first, though newer versions of setuptools do not require it anymore.
+    # You might need to install `wheel` first, though newer versions of setuptools do not require it anymore.
     # pip install --upgrade wheel
     python setup.py bdist_wheel
 
-Then you will find a wheel in the ``dist/`` folder. You can install this wheel by running:
+Then, you will find a wheel in the ``dist/`` folder. You can install this wheel by running:
 
 .. code-block:: shell
 
@@ -155,71 +159,99 @@ where ``<tags>`` are compatibility tags. You can figure them out by listing the 
 
 .. code-block:: shell
 
-    pip install dist/drtk-0.1.0-cp310-cp310-linux_x86_64.wh
+    pip install dist/drtk-0.1.0-cp310-cp310-linux_x86_64.whl
 
-Reinstalling the wheel
-^^^^^^^^^^^^^^^^^^^^^^
-
-If you had already previously installed pip, unless the version was increase, ``pip``` will not reinstall the package.
-If you are modifing package locally, that would be undesired behaivour, and in order to force reinstall you would need to add
-``-upgrade --force-reinstall --no-deps`` arguments, e.g.:
-
-.. code-block:: shell
-
-    pip install --upgrade --force-reinstall --no-deps .
-
-Inplace build
+In place build
 ^^^^^^^^^^^^^
 
-For package development, it can be very useful to do an inplace build with:
+For package development, it can be beneficial to do an inplace build with:
 
 .. code-block:: shell
 
     # There can be issues with concurrent build jobs, it is safer to specify `-inplace -j 1`
     python setup.py build_ext --inplace -j 1
 
-then you can use the root of the cloned repository as a working directory, and you should be able to do ``import drtk``, run tests and examples.
+Then you can use the root of the cloned repository as a working directory, and you should be able to do ``import drtk`` and run tests and examples.
 
-Trouble shooting
-^^^^^^^^^^^^^^^^
 
-If after installation, during the attempt of using the package the following error occurs:
+Troubleshooting
+================
+
+1. CUDA Error: No Kernel Image Available
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example Error Message:**
 
     RuntimeError: CUDA error: no kernel image is available for execution on the device
 
-that means that the CUDA code was not build for the arch where the code was running. The best way to resolve it using
-``TORCH_CUDA_ARCH_LIST`` as in example above.
 
-------------------
+**Cause:** This error occurs when the CUDA code was not built for the architecture of the device on which the code is running.
 
-If during the build or the attempt of using the package the following or similar error occurs:
+**Solution:** Specify the correct architecture using the ``TORCH_CUDA_ARCH_LIST`` environment variable when building the package. Refer to the examples in the :ref:`Specifying Architectures` section above.
+
+2. Import Error: ``*.so`` Not Found
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example Error Message:**
 
     ImportError: libcudnn.so.9: cannot open shared object file: No such file or directory
 
-then it is likely due to build isolation. Since we do not ditribute binaries at the moment, it is hard to get version mismatch otherwise.
-Make sure that you include ``--no-build-isolation`` argument.
+**Cause:** This issue is likely due to build isolation. Since DRTK currently does not distribute pre-compiled binaries, it is hard to get version mismatch otherwise.
 
-------------------
+**Solution:** Ensure you include the ``--no-build-isolation`` flag when installing from a local clone to use the correct CUDA and PyTorch libraries from your current environment:
 
-Errors like
+.. code-block:: shell
+
+    python -m build --wheel --no-isolation
+
+and
+
+.. code-block:: shell
+
+    pip install . --no-build-isolation
+
+
+3. Compilation Errors in CUDA or PyTorch headers
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**Example Error Message:**
 
     error: no suitable conversion function from "const __half" to "unsigned short" exists
 
-Typically means that there is compiler version mismatch, it is likely that the version is too old.
+**Cause:** This error typically indicates a compiler version mismatch. It is likely that your C++ or CUDA compiler version is too old to support some of the features.
 
-------------------
+**Solution:** Please consult PyTorch and CUDA documentation to figure out what CUDA version is supported by your PyTorch version and what C++ compiler version is needed.
 
-Errors like
 
-    ... aten/src/ATen/core/boxing/impl/boxing.h:41:105: error: expected primary-expression before ‘>’ token
+4. C++ Compilation Errors in PyTorch header aten/src/ATen/core/boxing/impl/boxing.h
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-are related to some problematic SFINAE logic in templates. This issue persisted in some recent PyTorch versions,
-and there was suggested remidation in https://github.com/pytorch/pytorch/issues/122169 which is to add ``-std=c++20`` to ``nvcc`` arguments.
+**Example Error Message:**
 
-That is why there is this line in ``setup.py``:
+    aten/src/ATen/core/boxing/impl/boxing.h:41:105: error: expected primary-expression before ‘>’ token
+
+
+**Cause:** This issue is related to problematic SFINAE logic in template code. It has been observed in some recent versions of PyTorch.
+
+**Solution:** One recommended solution is to add ``-std=c++20`` to the **nvcc** arguments, as suggested in `this GitHub issue <https://github.com/pytorch/pytorch/issues/122169>`_.
+This line has already been added to ``setup.py```:
 
 .. code-block:: python
 
     nvcc_args.append("-std=c++20")
 
-With some older versions of CUDA Toolkit, that may cause ``unrecognized command line option '-std=c++20'`` error.
+
+.. warning::
+
+    If you are using an older version of the CUDA Toolkit, adding this flag might result in an error:
+
+    .. code-block:: shell
+
+        unrecognized command line option '-std=c++20'
+
+
+    In this case, you may need to remove the ``-std=c++20`` flag from ``setup.py``, or update your CUDA Toolkit to a version that supports C++20.
+
+.. note::
+
+    According to the comments in the `GitHub issue <https://github.com/pytorch/pytorch/issues/122169>`_, this was fixed in PyTorch v2.4.0 release.
