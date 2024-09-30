@@ -7,3 +7,4 @@ accessible-pygments
 myst_parser
 sphinx_design
 nbsphinx
+ipython
