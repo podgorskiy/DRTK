@@ -21,13 +21,13 @@ article.bd-article .function dt.sig {
 }
 
 html[data-theme="dark"] {
-  --sig_nkg: #2b2b2b; #292c37;
+  --sig_nkg: #2b2b2b;
   --pst-color-inline-code: #e16969;
   --pst-color-surface: #2b2b2b;
 }
 
 html[data-theme="light"] {
-  --sig_nkg: #f2f2f2; #2b2b2b; #f3f4f7;
+  --sig_nkg: #f2f2f2;
   --pst-color-inline-code: #912525;
   --pst-color-surface: #f2f2f2;
 }
@@ -56,10 +56,10 @@ ul.bd-breadcrumbs {
   font-size: 2.5em;
 }
 .bd-main .bd-content .bd-article-container {
-  max-width: 80em;  default is 60em
+  max-width: 80em;
 }
 .bd-page-width {
-  max-width: 96rem;  default is 88rem
+  max-width: 96rem;
 }
 
 .bd-sidebar-primary {

@@ -8,12 +8,12 @@ html_theme.sidebar_secondary.remove: true
 
 # DRTK – Differentiable Rendering Toolkit
 
-DRTK is a Python package built on top of PyTorch, offering differentiable rasterization functionality. 
+DRTK is a Python package built on top of PyTorch, offering differentiable rasterization functionality.
 We focus on rasterization due to its speed, providing functionality which is typically common in real-time graphics, while leaving shading and lighting/material models for user implementation.
 
-Rasterization is a widely used rendering technique due to its speed and efficiency, especially for real-time applications. 
+Rasterization is a widely used rendering technique due to its speed and efficiency, especially for real-time applications.
 However, it presents challenges when used in differentiable rendering pipelines, particularly at visibility boundaries, where non-differentiable operations, such as discrete pixel coverage and occlusions, occur.
-DRTK implements a novel approach to computing gradients at these visibility discontinuities described in [**Rasterized Edge Gradients: Handling Discontinuities Differentiably**](https://arxiv.org/abs/2405.02508), overcoming the limitations inherent in rasterization’s fixed-grid structure and z-buffering. 
+DRTK implements a novel approach to computing gradients at these visibility discontinuities described in [**Rasterized Edge Gradients: Handling Discontinuities Differentiably**](https://arxiv.org/abs/2405.02508), overcoming the limitations inherent in rasterization’s fixed-grid structure and z-buffering.
 DRTK keeps the rasterization process intact and efficient while enabling gradient propagation through occlusion boundaries and geometry intersections.
 DRTK provides a set of differentiable components to build custom differentiable rendering pipelines, like the following:
 
@@ -126,4 +126,3 @@ api_reference/index
 
 GitHub <https://github.com/facebookresearch/DRTK>
 ```
-
