@@ -399,10 +399,10 @@ document.write(`
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>import drtk
-import torch as th
-import torch.nn.functional as thf
-from PIL import Image
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">drtk</span>
+<span class="kn">import</span> <span class="nn">torch</span> <span class="k">as</span> <span class="nn">th</span>
+<span class="kn">import</span> <span class="nn">torch.nn.functional</span> <span class="k">as</span> <span class="nn">thf</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span>
 </pre></div>
 </div>
 </div>
@@ -410,16 +410,16 @@ from PIL import Image
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>v = th.as_tensor(
-    [[70, 110, 10], [400, 60, 10], [300, 400, 10]], dtype=th.float32
-).cuda()[None]
-vi = th.as_tensor([[0, 1, 2]], dtype=th.int32).cuda()
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span>
+    <span class="p">[[</span><span class="mi">70</span><span class="p">,</span> <span class="mi">110</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">300</span><span class="p">,</span> <span class="mi">400</span><span class="p">,</span> <span class="mi">10</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">th</span><span class="o">.</span><span class="n">float32</span>
+<span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()[</span><span class="kc">None</span><span class="p">]</span>
+<span class="n">vi</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">([[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">th</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()</span>
 
-index_img = drtk.rasterize(v, vi, width=512, height=512)
+<span class="n">index_img</span> <span class="o">=</span> <span class="n">drtk</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
 
-image_gt = (index_img != -1).float()
+<span class="n">image_gt</span> <span class="o">=</span> <span class="p">(</span><span class="n">index_img</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
-Image.fromarray(image_gt[0].mul(255).clamp(min=0, max=255).byte().cpu().numpy())
+<span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image_gt</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -435,16 +435,16 @@ Image.fromarray(image_gt[0].mul(255).clamp(min=0, max=255).byte().cpu().numpy())
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>v = th.as_tensor(
-    [[120, 60, 10], [400, 200, 10], [100, 300, 10]], dtype=th.float32
-).cuda()[None]
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span> <span class="o">=</span> <span class="n">th</span><span class="o">.</span><span class="n">as_tensor</span><span class="p">(</span>
+    <span class="p">[[</span><span class="mi">120</span><span class="p">,</span> <span class="mi">60</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">10</span><span class="p">],</span> <span class="p">[</span><span class="mi">100</span><span class="p">,</span> <span class="mi">300</span><span class="p">,</span> <span class="mi">10</span><span class="p">]],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">th</span><span class="o">.</span><span class="n">float32</span>
+<span class="p">)</span><span class="o">.</span><span class="n">cuda</span><span class="p">()[</span><span class="kc">None</span><span class="p">]</span>
 
-index_img = drtk.rasterize(v, vi, width=512, height=512)
-depth_img, bary_img = drtk.render(v, vi, index_img)
+<span class="n">index_img</span> <span class="o">=</span> <span class="n">drtk</span><span class="o">.</span><span class="n">rasterize</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">512</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">512</span><span class="p">)</span>
+<span class="n">depth_img</span><span class="p">,</span> <span class="n">bary_img</span> <span class="o">=</span> <span class="n">drtk</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">index_img</span><span class="p">)</span>
 
-image = (index_img != -1).float()
+<span class="n">image</span> <span class="o">=</span> <span class="p">(</span><span class="n">index_img</span> <span class="o">!=</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">float</span><span class="p">()</span>
 
-Image.fromarray(image[0].mul(255).clamp(min=0, max=255).byte().cpu().numpy())
+<span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -460,9 +460,9 @@ Image.fromarray(image[0].mul(255).clamp(min=0, max=255).byte().cpu().numpy())
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>difference = thf.mse_loss(image, image_gt, reduction=&quot;none&quot;)
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">difference</span> <span class="o">=</span> <span class="n">thf</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">image_gt</span><span class="p">,</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
 
-Image.fromarray(difference[0].mul(255).clamp(min=0, max=255).byte().cpu().numpy())
+<span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">difference</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
@@ -478,21 +478,21 @@ Image.fromarray(difference[0].mul(255).clamp(min=0, max=255).byte().cpu().numpy(
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>v.requires_grad_(True)
-v.grad = None
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">v</span><span class="o">.</span><span class="n">requires_grad_</span><span class="p">(</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">v</span><span class="o">.</span><span class="n">grad</span> <span class="o">=</span> <span class="kc">None</span>
 
-tensor = []
-
-
-def save_tensor(x: th.Tensor):
-    tensor.append(x)
+<span class="n">tensor</span> <span class="o">=</span> <span class="p">[]</span>
 
 
-image_differentiable = drtk.edge_grad_estimator(
-    v, vi, bary_img, image[:, None], index_img, v_pix_img_hook=save_tensor
-)
-difference = thf.mse_loss(image_differentiable, image_gt[:, None], reduction=&quot;none&quot;)
-difference.sum().backward()
+<span class="k">def</span> <span class="nf">save_tensor</span><span class="p">(</span><span class="n">x</span><span class="p">:</span> <span class="n">th</span><span class="o">.</span><span class="n">Tensor</span><span class="p">):</span>
+    <span class="n">tensor</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+
+
+<span class="n">image_differentiable</span> <span class="o">=</span> <span class="n">drtk</span><span class="o">.</span><span class="n">edge_grad_estimator</span><span class="p">(</span>
+    <span class="n">v</span><span class="p">,</span> <span class="n">vi</span><span class="p">,</span> <span class="n">bary_img</span><span class="p">,</span> <span class="n">image</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">index_img</span><span class="p">,</span> <span class="n">v_pix_img_hook</span><span class="o">=</span><span class="n">save_tensor</span>
+<span class="p">)</span>
+<span class="n">difference</span> <span class="o">=</span> <span class="n">thf</span><span class="o">.</span><span class="n">mse_loss</span><span class="p">(</span><span class="n">image_differentiable</span><span class="p">,</span> <span class="n">image_gt</span><span class="p">[:,</span> <span class="kc">None</span><span class="p">],</span> <span class="n">reduction</span><span class="o">=</span><span class="s2">&quot;none&quot;</span><span class="p">)</span>
+<span class="n">difference</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span><span class="o">.</span><span class="n">backward</span><span class="p">()</span>
 </pre></div>
 </div>
 </div>
@@ -500,8 +500,8 @@ difference.sum().backward()
 <div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
 </pre></div>
 </div>
-<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span>print(tensor[0][0].shape)
-Image.fromarray(tensor[0][0].permute(1, 2, 0).mul(.5).add(0.5).mul(255).clamp(min=0, max=255).byte().cpu().numpy())
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+<span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">tensor</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">permute</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mf">.5</span><span class="p">)</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="mf">0.5</span><span class="p">)</span><span class="o">.</span><span class="n">mul</span><span class="p">(</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">clamp</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="mi">255</span><span class="p">)</span><span class="o">.</span><span class="n">byte</span><span class="p">()</span><span class="o">.</span><span class="n">cpu</span><span class="p">()</span><span class="o">.</span><span class="n">numpy</span><span class="p">())</span>
 </pre></div>
 </div>
 </div>
