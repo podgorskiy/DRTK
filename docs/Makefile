@@ -1,4 +1,3 @@
-
 SPHINXOPTS    ?=
 SPHINXAPIDOC  ?= sphinx-apidoc
 SPHINXBUILD   ?= sphinx-build

@@ -9,14 +9,9 @@ attributes across the fragments, e.i. pixels covered by the primitive.
 """
 
 import torch as th
+from drtk.utils import load_torch_ops
 
-try:
-    from drtk import interpolate_ext
-    th.ops.load_library(interpolate_ext.__file__)
-except ImportError as e:
-    import sys
-    if 'sphinx' not in sys.modules:
-        raise e
+load_torch_ops("drtk.interpolate_ext")
 
 
 @th.compiler.disable

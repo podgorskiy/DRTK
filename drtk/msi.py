@@ -4,14 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 
 import torch as th
+from drtk.utils import load_torch_ops
 
-try:
-    from drtk import msi_ext
-    th.ops.load_library(msi_ext.__file__)
-except ImportError as e:
-    import sys
-    if 'sphinx' not in sys.modules:
-        raise e
+load_torch_ops("drtk.msi_ext")
 
 
 @th.compiler.disable

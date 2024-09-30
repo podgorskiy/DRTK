@@ -6,14 +6,9 @@
 from typing import Tuple
 
 import torch as th
+from drtk.utils import load_torch_ops
 
-try:
-    from drtk import rasterize_ext
-    th.ops.load_library(rasterize_ext.__file__)
-except ImportError as e:
-    import sys
-    if 'sphinx' not in sys.modules:
-        raise e
+load_torch_ops("drtk.rasterize_ext")
 
 
 @th.compiler.disable

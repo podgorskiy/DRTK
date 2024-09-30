@@ -55,13 +55,11 @@ save_image(img, "render.png")
 ## Dependencies
 * PyTorch >= 2.1.0
 
-## Building
+## Installing
 
 To build a wheel and install it:
 ```
-pip install wheel
-python setup.py  bdist_wheel
-pip install dist/drtk-<wheel_name>.whl
+pip install git+https://github.com/facebookresearch/DRTK.git
 ```
 
 To build inplace, which is useful for package development:
@@ -74,7 +72,7 @@ python setup.py build_ext --inplace -j 1
 See the [CONTRIBUTING](CONTRIBUTING.md) file for how to help out.
 
 ## License
-DRTK is CC-BY-NC 4.0 licensed, as found in the [LICENSE](LICENSE) file.
+DRTK is MIT licensed, as found in the [LICENSE](LICENSE) file.
 
 ## Citation
 ```bibtex
