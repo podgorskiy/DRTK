@@ -175,7 +175,7 @@ To force a reinstall, add the following arguments: ``--upgrade --force-reinstall
 
 
 In place build
-^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^
 
 For package development, it can be beneficial to do an inplace build with:
 
