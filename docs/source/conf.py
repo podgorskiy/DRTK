@@ -61,10 +61,6 @@ html_theme_options = {
     "back_to_top_button": False,
     "pygments_light_style": "a11y-light",
     "pygments_dark_style": "a11y-dark",
-    "github_user": "facebookresearch",
-    "github_repo": "DRTK",
-    "github_version": "main",
-    "doc_path": "docs/source",
     "icon_links": [
         {
             # Label for this link
