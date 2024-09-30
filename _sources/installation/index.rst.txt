@@ -161,6 +161,19 @@ where ``<tags>`` are compatibility tags. You can figure them out by listing the 
 
     pip install dist/drtk-0.1.0-cp310-cp310-linux_x86_64.whl
 
+Reinstalling the Wheel
+^^^^^^^^^^^^^^^^^^^^^^
+
+If you have already installed the package using ``pip``, it will not reinstall the package unless the version number has been incremented.
+This behavior can be problematic if you are modifying the package locally and need to reinstall it.
+
+To force a reinstall, add the following arguments: ``--upgrade --force-reinstall --no-deps``. For example:
+
+.. code-block:: shell
+
+    pip install --upgrade --force-reinstall --no-deps .
+
+
 In place build
 ^^^^^^^^^^^^^
 

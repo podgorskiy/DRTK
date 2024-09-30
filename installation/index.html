@@ -531,6 +531,15 @@ python<span class="w"> </span>setup.py<span class="w"> </span>bdist_wheel
 </pre></div>
 </div>
 </section>
+<section id="reinstalling-the-wheel">
+<h2>Reinstalling the Wheel<a class="headerlink" href="#reinstalling-the-wheel" title="Link to this heading">#</a></h2>
+<p>If you have already installed the package using <code class="docutils literal notranslate"><span class="pre">pip</span></code>, it will not reinstall the package unless the version number has been incremented.
+This behavior can be problematic if you are modifying the package locally and need to reinstall it.</p>
+<p>To force a reinstall, add the following arguments: <code class="docutils literal notranslate"><span class="pre">--upgrade</span> <span class="pre">--force-reinstall</span> <span class="pre">--no-deps</span></code>. For example:</p>
+<div class="highlight-shell notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>--upgrade<span class="w"> </span>--force-reinstall<span class="w"> </span>--no-deps<span class="w"> </span>.
+</pre></div>
+</div>
+</section>
 <section id="in-place-build">
 <h2>In place build<a class="headerlink" href="#in-place-build" title="Link to this heading">#</a></h2>
 <p>For package development, it can be beneficial to do an inplace build with:</p>
@@ -632,6 +641,7 @@ This line has already been added to <code class="docutils literal notranslate"><
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#specifying-architectures">Specifying Architectures</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#installing-from-a-cloned-repository">Installing from a Cloned Repository</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#building-and-installing-a-wheel">Building and installing a wheel</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#reinstalling-the-wheel">Reinstalling the Wheel</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#in-place-build">In place build</a></li>
 </ul>
 </li>
