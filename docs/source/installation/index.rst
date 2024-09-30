@@ -4,22 +4,26 @@
 Installation
 ===================================
 
-At the moment, we do not distribute pre-compiled binaries. Current DRTK version is |version|.
+Currently, we do not provide pre-compiled binaries for DRTK.
+You will need to build the package from source. The current version of DRTK is |version|.
 
-Prerequisites:
+Prerequisites
+^^^^^^^^^^^^^
+
+Before installing DRTK, ensure you have the following prerequisites installed:
 
 * PyTorch >= 2.1.0
 * CUDA Toolkit
 
-Optionally, we would also recommend installing the following packages in order to run tests and examples:
+Additionally, we recommend installing the following packages to run tests and examples:
 
 * torchvision
 * opencv_python
 
-Installation from github using pip
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Installing DRTK from GitHub using pip
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-The easiest way to install, is using ``pip`` directly from github repo:
+The easiest way to install DRTK is by using pip with the GitHub repository directly:
 
 .. code-block:: shell
 
@@ -31,20 +35,24 @@ The easiest way to install, is using ``pip`` directly from github repo:
     # To install stable
     pip install git+https://github.com/facebookresearch/DRTK.git@stable
 
-It may take significant amount of time to compile. In most cases this should be enough, given that PyTorch,
+.. warning::
+
+    It may take significant amount of time to compile. The time could be 30 minutes or more.
+
+In most cases this should be enough, given that PyTorch,
 CUDA Toolkit, and Build Essentials for your platform are installed and environment is correctly configured.
 
-Specifying architectures
+Specifying Architectures
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If the CUDA arch of the device where the code will be running is known, then it would be better to specify it directly, e.g.:
+If you know the CUDA architecture of the device where the code will run, then it would be better to specify it directly, e.g.:
 
 .. code-block:: shell
 
     # TORCH_CUDA_ARCH_LIST can use "named" architecture, see table below
     TORCH_CUDA_ARCH_LIST="Ampere" install git+https://github.com/facebookresearch/DRTK.git
 
-or
+or specify numerical values for architectures explicitly:
 
 .. code-block:: shell
 
@@ -52,11 +60,16 @@ or
     # Add `+PTX` if you want also to save intermediate byte code for better compatibility.
     TORCH_CUDA_ARCH_LIST="8.0;8.6+PTX" install git+https://github.com/facebookresearch/DRTK.git
 
-which is the same.
+Note: Both commands above achieve the same result.
 
-If ``TORCH_CUDA_ARCH_LIST`` is not specified, the following architectures will be built by default: 7.2, 7.5, 8.0, 8.6, 9.0.
+If ``TORCH_CUDA_ARCH_LIST`` is not specified, DRTK will build for the following architectures by default: 7.2, 7.5, 8.0, 8.6, 9.0.
 
-``TORCH_CUDA_ARCH_LIST`` can either take one or more values (combined with plus `+` symbol) from a list of named architecture:
+``TORCH_CUDA_ARCH_LIST`` can take one or more values from the list of supported named or numerical architectures.
+When combining values, use a semicolon `;` or space to combine numerical values, and the `+` symbol for combining named values.
+
+LIst of supported numerical values: ``'3.5', '3.7', '5.0', '5.2', '5.3', '6.0', '6.1', '6.2', '7.0', '7.2', '7.5', '8.0', '8.6', '8.7', '8.9', '9.0', '9.0a'``.
+
+Supported "named" architecture values are shown in the table below:
 
 .. list-table:: Named architectures
    :header-rows: 1
@@ -88,15 +101,14 @@ If ``TORCH_CUDA_ARCH_LIST`` is not specified, the following architectures will b
    * - Hopper
      - 9.0+PTX
 
-or can take one or more values (combined into a one string with semicolon `;`) from the list of supported architecture list: ``'3.5', '3.7', '5.0', '5.2', '5.3', '6.0', '6.1', '6.2','7.0', '7.2', '7.5', '8.0', '8.6', '8.7', '8.9', '9.0', '9.0a'``.
 
-See more information about ``TORCH_CUDA_ARCH_LIST`` see `PyTorch docs <https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.CUDAExtension>`_ and  `source code on github <https://github.com/pytorch/pytorch/blob/c9653bf2ca6dd88b991d71abf836bd9a7a1d9dc3/torch/utils/cpp_extension.py#L1980>`_
+For more information about ``TORCH_CUDA_ARCH_LIST``, refer to the `PyTorch documentation <https://pytorch.org/docs/stable/cpp_extension.html#torch.utils.cpp_extension.CUDAExtension>`_ or view the `source code on GitHub <https://github.com/pytorch/pytorch/blob/c9653bf2ca6dd88b991d71abf836bd9a7a1d9dc3/torch/utils/cpp_extension.py#L1980>`_.
 
-Installing from a cloned repository
+Installing from a Cloned Repository
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Alternatively, you can install the package from a local clone of the repository.
-This can be handy, in case some adjustments are needed to the code of the package.
+This is useful if you need to make modifications to the package code.
 
 Clone the repository and ``cd`` into it:
 
