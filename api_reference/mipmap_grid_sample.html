@@ -415,7 +415,7 @@ document.write(`
 <td><p>Similar to torch.nn.functional.grid_sample, but supports mipmapping and anisotropic filtering which mimics graphics hardware behaviour.</p></td>
 </tr>
 <tr class="row-even"><td><p><a class="reference internal" href="#drtk.mipmap_grid_sample_ref" title="drtk.mipmap_grid_sample_ref"><code class="xref py py-obj docutils literal notranslate"><span class="pre">mipmap_grid_sample_ref</span></code></a></p></td>
-<td><p>A reference implementation for <cite>mipmap_grid_sample</cite>. See the doc string from <cite>mipmap_grid_sample</cite> The CUDA version of <cite>mipmap_grid_sample</cite> should behave the same as this referense implementation when:     - <cite>force_max_aniso</cite> argument of <cite>mipmap_grid_sample</cite> is set to True     - <cite>clip_grad</cite> argument of <cite>mipmap_grid_sample</cite> is set to False     - <cite>high_quality</cite> argument of <cite>mipmap_grid_sample_ref</cite> is set to False.</p></td>
+<td><p>A reference implementation for <cite>mipmap_grid_sample</cite>.</p></td>
 </tr>
 </tbody>
 </table>
@@ -458,8 +458,7 @@ layers for a texture of size 1024 instead of all 10. Hardware require all of the
 pyramid to be present. Such relaxed requirement leads to ambiguity when it needs to sample from
 the missing layer. The flag clip_grad only impacts the cases when needed layers from the mipmap
 pyramid are missing. In this scenario:</p>
-<blockquote>
-<div><ul>
+<ul>
 <li><p>when False: it will sample from the last available layer. This will lead to aliasing and
 sparsely placed taps. The downside is that it may sample from arbitrary far regions of
 the texture.</p></li>
@@ -467,7 +466,6 @@ the texture.</p></li>
 to match the sampling rate of the available layer. This will lead to aliasing but densely
 placed taps. Which in turn forbids it to sample from arbitrary far regions of the texture.</p></li>
 </ul>
-</div></blockquote>
 </p></li>
 </ul>
 </dd>
@@ -489,13 +487,11 @@ placed taps. Which in turn forbids it to sample from arbitrary far regions of th
 <span class="sig-prename descclassname"><span class="pre">drtk.</span></span><span class="sig-name descname"><span class="pre">mipmap_grid_sample_ref</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">input</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grid</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vt_dxdy_img</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_aniso</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bilinear'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding_mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'border'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">align_corners</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">high_quality</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/drtk/mipmap_grid_sample.html#mipmap_grid_sample_ref"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#drtk.mipmap_grid_sample_ref" title="Link to this definition">#</a></dt>
 <dd><p>A reference implementation for <cite>mipmap_grid_sample</cite>. See the doc string from <cite>mipmap_grid_sample</cite>
 The CUDA version of <cite>mipmap_grid_sample</cite> should behave the same as this referense implementation when:</p>
-<blockquote>
-<div><ul class="simple">
+<ul class="simple">
 <li><p><cite>force_max_aniso</cite> argument of <cite>mipmap_grid_sample</cite> is set to True</p></li>
 <li><p><cite>clip_grad</cite> argument of <cite>mipmap_grid_sample</cite> is set to False</p></li>
 <li><p><cite>high_quality</cite> argument of <cite>mipmap_grid_sample_ref</cite> is set to False</p></li>
 </ul>
-</div></blockquote>
 </dd></dl>
 
 </section>

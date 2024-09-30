@@ -448,12 +448,13 @@ document.write(`
 <span class="sd">            pyramid to be present. Such relaxed requirement leads to ambiguity when it needs to sample from</span>
 <span class="sd">            the missing layer. The flag clip_grad only impacts the cases when needed layers from the mipmap</span>
 <span class="sd">            pyramid are missing. In this scenario:</span>
-<span class="sd">                - when False: it will sample from the last available layer. This will lead to aliasing and</span>
-<span class="sd">                  sparsely placed taps. The downside is that it may sample from arbitrary far regions of</span>
-<span class="sd">                  the texture.</span>
-<span class="sd">                - when True: it will sample from the last available layer, but it will adjust the step size</span>
-<span class="sd">                  to match the sampling rate of the available layer. This will lead to aliasing but densely</span>
-<span class="sd">                  placed taps. Which in turn forbids it to sample from arbitrary far regions of the texture.</span>
+
+<span class="sd">            - when False: it will sample from the last available layer. This will lead to aliasing and</span>
+<span class="sd">              sparsely placed taps. The downside is that it may sample from arbitrary far regions of</span>
+<span class="sd">              the texture.</span>
+<span class="sd">            - when True: it will sample from the last available layer, but it will adjust the step size</span>
+<span class="sd">              to match the sampling rate of the available layer. This will lead to aliasing but densely</span>
+<span class="sd">              placed taps. Which in turn forbids it to sample from arbitrary far regions of the texture.</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">        output (Tensor): Result of sampling from inputs given the grid.</span>
@@ -521,9 +522,10 @@ document.write(`
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A reference implementation for `mipmap_grid_sample`. See the doc string from `mipmap_grid_sample`</span>
 <span class="sd">    The CUDA version of `mipmap_grid_sample` should behave the same as this referense implementation when:</span>
-<span class="sd">        - `force_max_aniso` argument of `mipmap_grid_sample` is set to True</span>
-<span class="sd">        - `clip_grad` argument of `mipmap_grid_sample` is set to False</span>
-<span class="sd">        - `high_quality` argument of `mipmap_grid_sample_ref` is set to False</span>
+
+<span class="sd">    - `force_max_aniso` argument of `mipmap_grid_sample` is set to True</span>
+<span class="sd">    - `clip_grad` argument of `mipmap_grid_sample` is set to False</span>
+<span class="sd">    - `high_quality` argument of `mipmap_grid_sample_ref` is set to False</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="n">q</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span>
