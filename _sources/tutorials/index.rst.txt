@@ -9,4 +9,5 @@ Tutorials
    :maxdepth: 3
    :caption: Getting Started
 
-   DRTK_Tutorial_Optimizing_geometry
+   DRTK_Tutorial_1_hello_triangle
+   DRTK_Tutorial_2_optimizing_geometry
