@@ -5,8 +5,7 @@ Tutorials
 ===================================
 
 .. toctree::
-   :glob:
-   :maxdepth: 3
+   :maxdepth: 4
    :caption: Getting Started
 
    DRTK_Tutorial_1_hello_triangle
