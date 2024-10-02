@@ -11,6 +11,7 @@ Tutorials
 
    DRTK_Tutorial_1_hello_triangle
    DRTK_Tutorial_2_optimizing_geometry
+   DRTK_Tutorial_3_geometry_intersection
 
 .. grid::
 
