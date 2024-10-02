@@ -1,4 +1,7 @@
-#!/usr/bin/env python3
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
 
 # -- Path setup --------------------------------------------------------------
 
@@ -17,7 +20,7 @@ from drtk import __version__
 # -- Project information -----------------------------------------------------
 
 project = "DRTK"
-copyright = "2024, Meta"
+copyright = "Copyright © 2024 Meta Platforms, Inc"
 author = "Meta"
 version = __version__
 
