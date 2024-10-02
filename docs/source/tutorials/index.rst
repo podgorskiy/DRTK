@@ -23,7 +23,14 @@ Tutorials
 
     .. grid-item-card:: :doc:`DRTK_Tutorial_2_optimizing_geometry`
 
-        In this tutorial, we will see how to setup a minimal example of geomtry optimization.
+        In this tutorial, we will see how to setup a minimal example of geometry optimization.
 
         .. image:: ../_static/tutorial_2_animation.gif
+          :width: 400
+
+    .. grid-item-card:: :doc:`DRTK_Tutorial_3_geometry_intersection`
+
+        In this tutorial, we demonstrate geometry effectively optimization when intersections are present.
+
+        .. image:: ../_static/tutorial_3_animation.gif
           :width: 400
