@@ -20,7 +20,7 @@ from drtk import __version__
 # -- Project information -----------------------------------------------------
 
 project = "DRTK"
-copyright = "Copyright © 2024 Meta Platforms, Inc"
+copyright = "2024 Meta Platforms, Inc"
 author = "Meta"
 version = __version__
 
@@ -58,6 +58,7 @@ html_theme_options = {
     "navbar_align": "content",
     "navbar_start": ["navbar-logo"],
     "navbar_end": ["theme-switcher", "navbar-icon-links"],
+    "footer_center": ["legal"],
     "collapse_navigation": True,
     "secondary_sidebar_items": ["page-toc"],
     "show_prev_next": False,
@@ -83,4 +84,5 @@ html_theme_options = {
 }
 
 html_static_path = ["_static"]
+templates_path = ["_templates"]
 html_css_files = ["custom.css"]
