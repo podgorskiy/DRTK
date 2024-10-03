@@ -18,15 +18,15 @@ Tutorials
    :caption: Mesh Rendering
    :hidden:
 
-   DRTK_Tutorial_hand_fitting
+   DRTK_Tutorial_rendering_meshes
+
 
 .. toctree::
    :maxdepth: 4
    :caption: Computing Gradients and Fitting
    :hidden:
 
-   DRTK_Tutorial_rendering_meshes
-
+   DRTK_Tutorial_hand_fitting
 
 .. grid::
 
