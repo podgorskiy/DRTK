@@ -62,7 +62,7 @@ Tutorials
 
 .. grid::
 
-    .. grid-item-card:: :doc:`DRTK_Tutorial_hand_optimization`
+    .. grid-item-card:: :doc:`DRTK_Tutorial_hand_fitting`
 
         In this tutorial, we demonstrate fitting of a simple hand model with simple lambertian material to a single photo.
 
